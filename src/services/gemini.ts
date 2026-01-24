@@ -1,13 +1,18 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
-// Initialize Gemini client
+// Initialize Gemini clients
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 if (!API_KEY || API_KEY === 'your_api_key_here') {
   console.warn('Gemini API key not configured. Please add your API key to .env file.');
 }
 
+// Old SDK for text generation
 const genAI = new GoogleGenerativeAI(API_KEY || '');
+
+// New SDK for image generation (same as your working code!)
+const ai = new GoogleGenAI({ apiKey: API_KEY || '' });
 
 // Types for generated story data
 export interface GeneratedStoryPage {
@@ -170,6 +175,7 @@ ${parsed.distinctiveFeatures ? `Special features: ${parsed.distinctiveFeatures}.
 
 /**
  * Generate a personalized children's story using Gemini
+ * Following the 5 Storytelling Principles for ages 0-5
  */
 export async function generateStory(params: StoryGenerationParams): Promise<GeneratedStory> {
   // Add delay to avoid rate limiting
@@ -177,20 +183,58 @@ export async function generateStory(params: StoryGenerationParams): Promise<Gene
 
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-  const prompt = `Create a children's story for ages ${params.age} in ${params.language}.
+  const prompt = `You are a children's book author creating a story for ages ${params.age} in ${params.language}.
 
-Main character: A toy named "${params.toyName}" which is a ${params.toyDescription}.
-Personality: ${params.energy}% energetic (0=calm, 100=very active), ${params.confidence}% confident (0=shy, 100=brave)
+══════════════════════════════════════════════════════════════
+MAIN CHARACTER
+══════════════════════════════════════════════════════════════
+Name: "${params.toyName}"
+Description: ${params.toyDescription}
+Personality: ${getPersonalityDescription(params.energy, params.confidence)}
 
-Requirements:
-- 6 short paragraphs (1-3 sentences each)
-- Age-appropriate vocabulary for ${params.age} year olds
-- Positive, adventurous theme
-- Include 4 vocabulary words that would be educational for this age group
-- End on a happy, comforting note
-- The personality should influence the story: ${getPersonalityDescription(params.energy, params.confidence)}
+══════════════════════════════════════════════════════════════
+5 STORYTELLING PRINCIPLES (FOLLOW THESE EXACTLY)
+══════════════════════════════════════════════════════════════
 
-IMPORTANT: You must respond with ONLY valid JSON, no markdown formatting, no code blocks. Format:
+1. SIMPLE YET MEANINGFUL STORY STRUCTURE
+   - Page 1: Introduce ${params.toyName} in their cozy world
+   - Page 2-3: Present a small, relatable problem (lost something, feeling shy, wanting to try something new)
+   - Page 4-5: Show their journey - exploration, emotions, reactions to the challenge
+   - Page 6: Heartwarming resolution with a clear, gentle lesson
+
+2. STRONG, RELATABLE EMOTIONS
+   - Use emotions children recognize: joy, worry, curiosity, excitement, pride
+   - Show expressive reactions: "${params.toyName}'s eyes grew wide!" or "${params.toyName} felt a little flutter in their tummy."
+
+3. PLAYFUL AND ENGAGING LANGUAGE
+   - Short, rhythmic sentences fun to read aloud
+   - Use REPETITION: "${params.toyName} looked left. ${params.toyName} looked right."
+   - Use ONOMATOPOEIA: "WHOOSH! SPLASH! POP! CRASH!"
+   - Use occasional RHYME: "Up and down, all around!"
+   - Dr. Seuss-style playfulness encouraged
+
+4. VISUALLY RICH DESCRIPTIONS
+   - Simple but vivid imagery: "The sun painted the sky orange and pink"
+   - Sensory details: soft, warm, sparkly, squishy, tiny
+
+5. GENTLE, POSITIVE LESSON
+   - End with uplifting message like:
+     "It's okay to make mistakes!"
+     "Everyone is special in their own way!"
+     "Trying something new can be exciting!"
+     "Being kind makes the world brighter!"
+
+══════════════════════════════════════════════════════════════
+OUTPUT REQUIREMENTS
+══════════════════════════════════════════════════════════════
+
+- Write in ${params.language}
+- 6 pages, each 2-4 short sentences
+- Include 4 vocabulary words appropriate for ${params.age} year olds
+- Vocabulary should come from the story naturally
+- Make it wholesome, imaginative, and perfect for reading aloud
+
+IMPORTANT: Respond with ONLY valid JSON, no markdown, no code blocks:
 {
   "pages": [
     {"pageNumber": 1, "text": "..."},
@@ -201,10 +245,10 @@ IMPORTANT: You must respond with ONLY valid JSON, no markdown formatting, no cod
     {"pageNumber": 6, "text": "..."}
   ],
   "vocabulary": [
-    {"word": "...", "pronunciation": "...", "definition": "...", "icon": "emoji"},
-    {"word": "...", "pronunciation": "...", "definition": "...", "icon": "emoji"},
-    {"word": "...", "pronunciation": "...", "definition": "...", "icon": "emoji"},
-    {"word": "...", "pronunciation": "...", "definition": "...", "icon": "emoji"}
+    {"word": "...", "pronunciation": "...", "definition": "child-friendly definition", "icon": "emoji"},
+    {"word": "...", "pronunciation": "...", "definition": "child-friendly definition", "icon": "emoji"},
+    {"word": "...", "pronunciation": "...", "definition": "child-friendly definition", "icon": "emoji"},
+    {"word": "...", "pronunciation": "...", "definition": "child-friendly definition", "icon": "emoji"}
   ]
 }`;
 
@@ -280,63 +324,98 @@ export interface ImageGenerationParams {
   toyDescription: string;
   toyName: string;
   pageNumber: number;
+  totalPages: number;
 }
 
 /**
- * Generate an illustration for a story page using Gemini
+ * Extract the key action/scene from story text for illustration
+ */
+function extractSceneAction(storyText: string, pageNumber: number, totalPages: number): string {
+  // Add context based on typical story structure
+  if (pageNumber === 1) {
+    return `INTRODUCTION SCENE - Show the main character in their home/starting location. ${storyText}`;
+  } else if (pageNumber === totalPages) {
+    return `ENDING SCENE - Happy, peaceful conclusion. ${storyText}`;
+  } else {
+    return `ADVENTURE SCENE - ${storyText}`;
+  }
+}
+
+/**
+ * Generate an illustration for a story page using gemini-2.5-flash-image
+ * Uses the same SDK and model that works in Google AI Studio
  */
 export async function generateStoryImage(params: ImageGenerationParams): Promise<string> {
-  // Add delay to avoid rate limiting
-  await delay(3000);
+  // Add small delay to be nice to the API
+  await delay(1000);
 
-  const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash-exp",
-    generationConfig: {
-      responseModalities: ["image", "text"],
-    } as any,
-  });
+  const sceneDescription = extractSceneAction(params.storyText, params.pageNumber, params.totalPages);
 
-  const imagePrompt = `Create a children's book illustration for this scene:
+  // Build prompt similar to your working code
+  const imagePrompt = `Create a ${IMAGE_STYLE.style} children's book illustration.
 
-SCENE: ${params.storyText}
+Subject: A toy named "${params.toyName}" which is ${params.toyDescription}.
 
-MAIN CHARACTER: A toy named "${params.toyName}" which is ${params.toyDescription}.
-The toy should be the main focus and look cute and friendly.
+Scene: ${sceneDescription}
 
-ART STYLE: ${IMAGE_STYLE.style}
-LIGHTING: ${IMAGE_STYLE.lighting}
-MOOD: ${IMAGE_STYLE.mood}
-QUALITY: ${IMAGE_STYLE.quality}
+CRITICAL VISUAL CONSTRAINTS:
+- The toy "${params.toyName}" must be the main focus of the image
+- Style: ${IMAGE_STYLE.mood}, ${IMAGE_STYLE.lighting}
+- Quality: ${IMAGE_STYLE.quality}
+- Do NOT include: ${IMAGE_STYLE.negative}
 
-DO NOT include: ${IMAGE_STYLE.negative}
+The illustration should be magical, warm, and perfect for a children's storybook.`;
 
-This is page ${params.pageNumber} of a children's storybook. Make the illustration magical and engaging for young children.`;
+  console.log(`[Image Gen] Page ${params.pageNumber} - Using gemini-2.5-flash-image`);
+  console.log(`[Image Gen] Prompt preview:`, imagePrompt.substring(0, 150) + '...');
 
   try {
-    const result = await model.generateContent(imagePrompt);
-    const response = await result.response;
+    // Use the same pattern as your working Google AI Studio code
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: [
+        {
+          parts: [
+            {
+              text: imagePrompt,
+            },
+          ],
+        },
+      ],
+    });
 
-    // Check if we got an image in the response
-    const parts = response.candidates?.[0]?.content?.parts;
-    if (parts) {
-      for (const part of parts) {
-        if ((part as any).inlineData?.mimeType?.startsWith('image/')) {
-          const imageData = (part as any).inlineData.data;
-          const mimeType = (part as any).inlineData.mimeType;
+    console.log(`[Image Gen] Page ${params.pageNumber} - Response received`);
+
+    // Extract image from response
+    if (response.candidates && response.candidates[0]?.content?.parts) {
+      for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData?.mimeType?.startsWith('image/')) {
+          const imageData = part.inlineData.data;
+          const mimeType = part.inlineData.mimeType;
+          console.log(`[Image Gen] Page ${params.pageNumber} - Success! Got ${mimeType} image`);
           return `data:${mimeType};base64,${imageData}`;
         }
       }
     }
 
+    console.error(`[Image Gen] Page ${params.pageNumber} - No image in response`);
     throw new Error('No image in response');
-  } catch (error) {
-    console.error('Image generation failed:', error);
+  } catch (error: any) {
+    console.error(`[Image Gen] Page ${params.pageNumber} failed:`, error?.message || error);
     throw error;
   }
 }
 
 /**
+ * Reset model index (not needed anymore but kept for compatibility)
+ */
+export function resetImageModelIndex(): void {
+  // No-op - using single model now
+}
+
+/**
  * Generate all images for a story
+ * Each image will feature the same toy character in different scenes
  */
 export async function generateAllStoryImages(
   pages: GeneratedStoryPage[],
@@ -345,9 +424,14 @@ export async function generateAllStoryImages(
   onProgress?: (current: number, total: number) => void
 ): Promise<string[]> {
   const images: string[] = [];
+  const totalPages = pages.length;
+
+  console.log('Starting image generation for', totalPages, 'pages');
+  console.log('Toy character description:', toyDescription);
 
   for (let i = 0; i < pages.length; i++) {
-    onProgress?.(i + 1, pages.length);
+    onProgress?.(i + 1, totalPages);
+    console.log(`Generating image ${i + 1}/${totalPages}: "${pages[i].text.substring(0, 50)}..."`);
 
     try {
       const imageUrl = await generateStoryImage({
@@ -355,11 +439,13 @@ export async function generateAllStoryImages(
         toyDescription,
         toyName,
         pageNumber: i + 1,
+        totalPages,
       });
       images.push(imageUrl);
+      console.log(`✓ Image ${i + 1} generated successfully`);
     } catch (error) {
-      console.error(`Failed to generate image for page ${i + 1}:`, error);
-      // Use a placeholder if image generation fails
+      console.error(`✗ Failed to generate image for page ${i + 1}:`, error);
+      // Use empty string - will fall back to default image
       images.push('');
     }
   }

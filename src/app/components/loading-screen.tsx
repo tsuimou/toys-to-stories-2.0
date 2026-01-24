@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Sparkles, AlertCircle, RefreshCw } from "lucide-react";
 import { colors } from "@/utils/colors";
-import { analyzeToyImage, generateStory, generateAllStoryImages, isApiConfigured, GeneratedStory } from "@/services/gemini";
+import { analyzeToyImageDetailed, generateStory, generateAllStoryImages, isApiConfigured, GeneratedStory, ToyCharacterProfile, resetImageModelIndex } from "@/services/gemini";
 import { StoryPage, VocabWord } from "@/app/data/story-translations";
 
 // Default image URLs for generated stories
@@ -67,19 +67,33 @@ export function LoadingScreen({
         return;
       }
 
-      // Step 1: Analyze the toy image
-      let toyDescription = "";
+      // Step 1: Analyze the toy image in DETAIL for consistent character
+      let toyProfile: ToyCharacterProfile;
       try {
-        toyDescription = await analyzeToyImage(toyPhoto);
-        setProgress(40);
+        toyProfile = await analyzeToyImageDetailed(toyPhoto);
+        console.log("Toy character profile:", toyProfile);
+        setProgress(30);
       } catch (e) {
         console.warn("Image analysis failed, using generic description:", e);
-        toyDescription = "a beloved stuffed toy";
-        setProgress(40);
+        toyProfile = {
+          type: 'stuffed toy',
+          primaryColor: 'soft colors',
+          secondaryColors: 'none',
+          material: 'plush',
+          size: 'huggable',
+          facialFeatures: 'friendly face with kind eyes',
+          bodyShape: 'cuddly and round',
+          clothing: 'none',
+          accessories: 'none',
+          fullDescription: 'A cute, cuddly stuffed toy with a friendly face and kind eyes',
+        };
+        setProgress(30);
       }
 
+      const toyDescription = toyProfile.fullDescription;
+
       setStage("generating");
-      setProgress(50);
+      setProgress(35);
 
       // Step 2: Generate the story
       const generatedStory: GeneratedStory = await generateStory({
@@ -94,7 +108,8 @@ export function LoadingScreen({
       setProgress(50);
       setStage("illustrating");
 
-      // Step 3: Generate images for each page
+      // Step 3: Generate images for each page (with model fallback)
+      resetImageModelIndex(); // Start fresh with first model
       let generatedImages: string[] = [];
       try {
         generatedImages = await generateAllStoryImages(
@@ -107,7 +122,7 @@ export function LoadingScreen({
           }
         );
       } catch (imgError) {
-        console.warn("Image generation failed, using default images:", imgError);
+        console.warn("All image models failed, using default images:", imgError);
         generatedImages = [];
       }
 
