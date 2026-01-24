@@ -124,14 +124,14 @@ export function PhotoUpload({ onGenerateStory, onBack }: PhotoUploadProps) {
                   0 10px 30px rgba(0,0,0,0.3)
                 `
               : `
-                  inset 0 0 0 8px #D4B800,
-                  inset 0 0 0 12px #FFF8E7,
-                  0 0 0 6px #D4B800, 
-                  0 8px 0 #D4B800, 
-                  0 10px 30px rgba(0,0,0,0.3)
+                  inset 0px 0px 0px 8px rgba(212, 184, 0, 1),
+                  inset 0px 0px 0px 12px rgba(255, 248, 231, 1),
+                  0px 0px 0px 6px rgba(212, 184, 0, 1),
+                  0px 10px 0px 0px rgba(212, 184, 0, 1),
+                  0px 12px 35px 0px rgba(0, 0, 0, 0.35)
                 `,
             overflow: 'hidden',
-            borderRadius: 'clamp(24px, 4vw, 32px)'
+            borderRadius: '44px'
           }}
           onClick={handleClick}
           onDrop={handleDrop}
@@ -140,11 +140,11 @@ export function PhotoUpload({ onGenerateStory, onBack }: PhotoUploadProps) {
           whileHover={{
             scale: 1.02,
             boxShadow: `
-              inset 0 0 0 8px #D4B800,
-              inset 0 0 0 12px #FFF8E7,
-              0 0 0 6px #D4B800, 
-              0 10px 0 #D4B800, 
-              0 12px 35px rgba(0,0,0,0.35)
+              inset 0px 0px 0px 8px rgba(212, 184, 0, 1),
+              inset 0px 0px 0px 12px rgba(255, 248, 231, 1),
+              0px 0px 0px 6px rgba(212, 184, 0, 1),
+              0px 10px 0px 0px rgba(212, 184, 0, 1),
+              0px 12px 35px 0px rgba(0, 0, 0, 0.35)
             `
           }}
         >
@@ -351,7 +351,7 @@ export function PhotoUpload({ onGenerateStory, onBack }: PhotoUploadProps) {
 
         {/* Safety Reminder */}
         <div className="flex items-center justify-center gap-2 mb-4" style={{
-          color: colors.yellowDark
+          color: 'rgba(205, 161, 4, 1)'
         }}>
           <AlertCircle size={20} />
           <p className="text-lg" style={{ fontWeight: 600 }}>Make sure no faces are in the photo</p>
