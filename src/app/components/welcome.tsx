@@ -1,0 +1,264 @@
+import { motion } from "motion/react";
+import { Sparkles } from "lucide-react";
+import { colors, withOpacity } from "@/utils/colors";
+
+interface WelcomeProps {
+  onGetStarted: () => void;
+}
+
+export function Welcome({ onGetStarted }: WelcomeProps) {
+  return (
+    <div className="h-screen flex items-center justify-center p-10 relative overflow-hidden" style={{ fontFamily: 'Nunito, sans-serif' }}>
+      {/* Floating decorative circles - Headspace style */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          width: '300px',
+          height: '300px',
+          background: withOpacity(colors.skyBlue, 0.15),
+          top: '10%',
+          left: '5%',
+          filter: 'blur(40px)'
+        }}
+        animate={{
+          y: [0, 30, 0],
+          scale: [1, 1.1, 1]
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          width: '400px',
+          height: '400px',
+          background: withOpacity(colors.yellow, 0.12),
+          bottom: '10%',
+          right: '5%',
+          filter: 'blur(40px)'
+        }}
+        animate={{
+          y: [0, -40, 0],
+          scale: [1, 1.15, 1]
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          width: '200px',
+          height: '200px',
+          background: withOpacity(colors.red, 0.1),
+          top: '40%',
+          right: '15%',
+          filter: 'blur(30px)'
+        }}
+        animate={{
+          y: [0, 25, 0],
+          x: [0, 15, 0]
+        }}
+        transition={{
+          duration: 7,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      
+      <div className="w-full max-w-2xl text-center relative z-10">
+        {/* Logo/Icon */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center"
+        >
+          {/* Main Title */}
+          <motion.h1 
+            className="text-7xl mb-6" 
+            style={{ 
+              fontFamily: 'Fredoka, sans-serif',
+              color: colors.textPrimary,
+              fontWeight: 700
+            }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            Toys to Stories 2.0
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p 
+            className="text-2xl mb-12" 
+            style={{ color: colors.textPrimary, opacity: 0.8 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.8 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+          >
+            Create Magical Stories with your Favourite Toys
+          </motion.p>
+
+          {/* Feature Cards */}
+          <motion.div 
+            className="grid grid-cols-3 gap-6 mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+          >
+            {/* Card 1 */}
+            <motion.div 
+              className="rounded-3xl p-8 text-center"
+              style={{ 
+                background: `linear-gradient(180deg, ${colors.skyBlueLight} 0%, ${colors.skyBlue} 100%)`,
+                boxShadow: `0 0 0 4px ${colors.skyBlueDark}, 0 5px 0 ${colors.skyBlueDark}, 0 6px 20px rgba(0,0,0,0.2)`
+              }}
+              animate={{
+                y: [0, -10, 0]
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0
+              }}
+            >
+              <div className="text-5xl mb-4">📸</div>
+              <h3 
+                className="text-2xl mb-2"
+                style={{ 
+                  fontFamily: 'Fredoka, sans-serif',
+                  color: colors.white,
+                  fontWeight: 700,
+                  textShadow: `2px 2px 0 ${colors.skyBlueDark}`
+                }}
+              >
+                Snap a Photo
+              </h3>
+              <p className="text-lg" style={{ color: colors.white, opacity: 0.95, fontWeight: 600 }}>
+                Take a picture of your child's toys
+              </p>
+            </motion.div>
+
+            {/* Card 2 */}
+            <motion.div 
+              className="rounded-3xl p-8 text-center"
+              style={{ 
+                background: `linear-gradient(180deg, ${colors.yellowLight} 0%, ${colors.yellow} 100%)`,
+                boxShadow: `0 0 0 4px ${colors.yellowDark}, 0 5px 0 ${colors.yellowDark}, 0 6px 20px rgba(0,0,0,0.2)`
+              }}
+              animate={{
+                y: [0, -10, 0]
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.3
+              }}
+            >
+              <div className="text-5xl mb-4">✨</div>
+              <h3 
+                className="text-2xl mb-2"
+                style={{ 
+                  fontFamily: 'Fredoka, sans-serif',
+                  color: colors.textPrimary,
+                  fontWeight: 700,
+                  textShadow: `2px 2px 0 ${colors.yellowDark}`
+                }}
+              >
+                Watch Magic
+              </h3>
+              <p className="text-lg" style={{ color: colors.textPrimary, opacity: 0.85, fontWeight: 600 }}>
+                See toys become story characters
+              </p>
+            </motion.div>
+
+            {/* Card 3 */}
+            <motion.div 
+              className="rounded-3xl p-8 text-center"
+              style={{ 
+                background: `linear-gradient(180deg, ${colors.redLight} 0%, ${colors.red} 100%)`,
+                boxShadow: `0 0 0 4px ${colors.redDark}, 0 5px 0 ${colors.redDark}, 0 6px 20px rgba(0,0,0,0.2)`
+              }}
+              animate={{
+                y: [0, -10, 0]
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.6
+              }}
+            >
+              <div className="text-5xl mb-4">📚</div>
+              <h3 
+                className="text-2xl mb-2"
+                style={{ 
+                  fontFamily: 'Fredoka, sans-serif',
+                  color: colors.white,
+                  fontWeight: 700,
+                  textShadow: `2px 2px 0 ${colors.redDark}`
+                }}
+              >
+                Read Together
+              </h3>
+              <p className="text-lg" style={{ color: colors.white, opacity: 0.95, fontWeight: 600 }}>
+                Enjoy a personalized storybook
+              </p>
+            </motion.div>
+          </motion.div>
+
+          {/* Info Text */}
+          <motion.p 
+            className="text-xl mb-8" 
+            style={{ color: colors.textPrimary, opacity: 0.6 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.6 }}
+            transition={{ delay: 0.8, duration: 0.5 }}
+          >
+            Perfect for children ages 2-5 • Available in multiple languages
+          </motion.p>
+
+          {/* Get Started Button */}
+          <div className="flex justify-center mt-8">
+            <motion.button
+              onClick={onGetStarted}
+              className="rounded-full px-16 py-5 cursor-pointer transition-all duration-200"
+              style={{ 
+                background: `linear-gradient(180deg, ${colors.primaryLight} 0%, ${colors.primary} 100%)`,
+                color: colors.white,
+                fontSize: '20px',
+                fontFamily: 'Fredoka, sans-serif',
+                fontWeight: 700,
+                boxShadow: `0 0 0 5px ${colors.primaryDark}, 0 6px 0 ${colors.primaryDark}, 0 8px 20px rgba(0,0,0,0.3)`,
+                border: 'none',
+                textShadow: `2px 2px 0 ${colors.primaryDark}, -1px -1px 0 ${colors.primaryDark}, 1px -1px 0 ${colors.primaryDark}, -1px 1px 0 ${colors.primaryDark}`
+              }}
+              whileHover={{ 
+                scale: 1.05,
+                boxShadow: `0 0 0 5px ${colors.primaryDark}, 0 8px 0 ${colors.primaryDark}, 0 10px 25px rgba(0,0,0,0.35)`
+              }}
+              whileTap={{ 
+                scale: 0.95,
+                boxShadow: `0 0 0 5px ${colors.primaryDark}, 0 2px 0 ${colors.primaryDark}, 0 4px 10px rgba(0,0,0,0.3)`,
+                translateY: 4
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1, duration: 0.5 }}
+            >
+              Get Started
+            </motion.button>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
