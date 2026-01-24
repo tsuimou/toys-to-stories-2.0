@@ -108,11 +108,16 @@ src/
 └── styles/             # CSS files
 ```
 
+## Built With
+
+- [Figma Make](https://www.figma.com/make/) - Design to code generation
+- [Cursor](https://cursor.com/) - AI-powered code editor
+- [Claude Code](https://claude.ai/claude-code) - AI coding assistant
+
 ## Credits
 
 - UI Components: [shadcn/ui](https://ui.shadcn.com/) (MIT License)
 - Icons: [Lucide](https://lucide.dev/)
-- Design: Original Figma design
 
 ## License
 
