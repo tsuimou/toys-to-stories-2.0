@@ -1,8 +1,7 @@
 import React, { useState, useCallback, useRef } from "react";
 import { motion } from "motion/react";
 import { StepIndicator } from "@/app/components/step-indicator";
-import { BackButton } from "@/app/components/back-button";
-import { Camera, AlertCircle, X, Image } from "lucide-react";
+import { Camera, AlertCircle, X, Image, ArrowLeft } from "lucide-react";
 import { colors, withOpacity, opacity } from "@/utils/colors";
 
 interface PhotoUploadProps {
@@ -62,32 +61,40 @@ export function PhotoUpload({ onGenerateStory, onBack }: PhotoUploadProps) {
   };
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 md:p-10 relative overflow-auto" style={{ fontFamily: 'Nunito, sans-serif' }}>
-      {/* Floating decorative circles */}
-      <motion.div
-        className="absolute rounded-full"
-        style={{
-          width: '220px',
-          height: '220px',
-          background: withOpacity(colors.skyBlue, 0.15),
-          bottom: '15%',
-          left: '8%',
-          filter: 'blur(40px)'
+    <div className="h-screen flex flex-col p-4 sm:p-6 md:p-10 relative overflow-y-auto" style={{ fontFamily: 'Nunito, sans-serif' }}>
+      {/* Back Button - Responsive position to match container padding */}
+      <motion.button
+        onClick={onBack}
+        className="absolute flex items-center gap-2 z-50 rounded-full top-4 left-4 sm:top-6 sm:left-6 md:top-10 md:left-10"
+        style={{ 
+          color: colors.white, 
+          paddingLeft: '20px',
+          paddingRight: '24px',
+          paddingTop: '14px',
+          paddingBottom: '14px',
+          cursor: 'pointer',
+          background: `linear-gradient(180deg, ${colors.mediumGray} 0%, ${colors.darkGray} 100%)`,
+          border: 'none',
+          boxShadow: `0 0 0 3px ${colors.darkGray}, 0 4px 0 ${colors.darkGray}, 0 5px 12px rgba(0,0,0,0.3)`,
+          fontFamily: 'Fredoka, sans-serif',
+          fontWeight: 700,
+          fontSize: '18px'
         }}
-        animate={{
-          y: [0, -30, 0],
+        whileHover={{
+          scale: 1.05,
+          boxShadow: `0 0 0 3px ${colors.darkGray}, 0 6px 0 ${colors.darkGray}, 0 7px 15px rgba(0,0,0,0.35)`
         }}
-        transition={{
-          duration: 9,
-          repeat: Infinity,
-          ease: "easeInOut"
+        whileTap={{
+          scale: 0.95,
+          boxShadow: `0 0 0 3px ${colors.darkGray}, 0 2px 0 ${colors.darkGray}, 0 3px 8px rgba(0,0,0,0.3)`,
+          translateY: 2
         }}
-      />
-      
-      {/* Back Button - Fixed position relative to viewport */}
-      <BackButton onClick={onBack} />
+      >
+        <ArrowLeft size={20} />
+        <span>Back</span>
+      </motion.button>
 
-      <div className="w-full max-w-3xl mx-auto relative z-10" style={{ paddingTop: '2.5rem' }}>
+      <div className="w-full max-w-3xl mx-auto relative z-10 pt-4 sm:pt-6 md:pt-10">
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8">
           <h1 
@@ -111,8 +118,8 @@ export function PhotoUpload({ onGenerateStory, onBack }: PhotoUploadProps) {
           className="mb-6 sm:mb-8 cursor-pointer transition-all duration-200 flex items-center justify-center relative overflow-hidden mt-8 sm:mt-12 mx-auto"
           style={{
             width: 'min(600px, calc(100vw - 2rem))',
-            height: 'clamp(400px, 50vh, 500px)',
-            margin: 'clamp(2rem, 3vw, 3rem) auto 2rem auto',
+            height: 'clamp(250px, 35vh, 450px)',
+            margin: 'clamp(1rem, 2vw, 2rem) auto clamp(0.5rem, 1.5vw, 1.5rem) auto',
             backgroundColor: isDragging ? withOpacity(colors.skyBlue, 0.2) : '#FFF8E7',
             border: 'none',
             boxShadow: isDragging 

@@ -91,19 +91,18 @@ export default function App() {
     alert("PDF download would start here! In a real app, this would generate and download a PDF of the story and vocabulary.");
   };
 
+  // Onboarding screens use cloud background
+  const isOnboarding = ['welcome', 'language', 'age', 'upload', 'toyName', 'personality'].includes(currentScreen);
+  const isDarkScreen = ['loading', 'story', 'vocabulary'].includes(currentScreen);
+
   return (
-    <div 
-      className="w-full h-screen flex items-center justify-center" 
-      style={{ 
-        backgroundColor: currentScreen === 'loading' || currentScreen === 'story' || currentScreen === 'vocabulary' ? '#1a1a2e' : colors.backgroundPrimary,
-        backgroundImage: currentScreen === 'loading' || currentScreen === 'story' || currentScreen === 'vocabulary' ? 'none' : `
-          linear-gradient(rgba(135, 206, 235, 0.06) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(135, 206, 235, 0.06) 1px, transparent 1px)
-        `,
-        backgroundSize: '20px 20px'
+    <div
+      className="w-full min-h-screen flex items-center justify-center overflow-y-auto"
+      style={{
+        backgroundColor: isDarkScreen ? '#1a1a2e' : '#FFF9F0',
       }}
     >
-      <div className={currentScreen === 'story' || currentScreen === 'loading' || currentScreen === 'vocabulary' ? 'w-full h-full' : 'w-full max-w-[1024px] h-full'}>
+      <div className={currentScreen === 'story' || currentScreen === 'loading' || currentScreen === 'vocabulary' ? 'w-full h-full' : 'w-full max-w-[1024px] min-h-full'}>
         {currentScreen === "welcome" && (
           <Welcome onGetStarted={handleGetStarted} />
         )}

@@ -8,69 +8,7 @@ interface WelcomeProps {
 
 export function Welcome({ onGetStarted }: WelcomeProps) {
   return (
-    <div className="h-screen flex items-center justify-center p-10 relative overflow-hidden" style={{ fontFamily: 'Nunito, sans-serif' }}>
-      {/* Floating decorative circles - Headspace style */}
-      <motion.div
-        className="absolute rounded-full"
-        style={{
-          width: '300px',
-          height: '300px',
-          background: withOpacity(colors.skyBlue, 0.15),
-          top: '10%',
-          left: '5%',
-          filter: 'blur(40px)'
-        }}
-        animate={{
-          y: [0, 30, 0],
-          scale: [1, 1.1, 1]
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      <motion.div
-        className="absolute rounded-full"
-        style={{
-          width: '400px',
-          height: '400px',
-          background: withOpacity(colors.yellow, 0.12),
-          bottom: '10%',
-          right: '5%',
-          filter: 'blur(40px)'
-        }}
-        animate={{
-          y: [0, -40, 0],
-          scale: [1, 1.15, 1]
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      <motion.div
-        className="absolute rounded-full"
-        style={{
-          width: '200px',
-          height: '200px',
-          background: withOpacity(colors.red, 0.1),
-          top: '40%',
-          right: '15%',
-          filter: 'blur(30px)'
-        }}
-        animate={{
-          y: [0, 25, 0],
-          x: [0, 15, 0]
-        }}
-        transition={{
-          duration: 7,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      
+    <div className="h-screen flex items-center justify-center p-4 sm:p-6 md:p-10 relative overflow-y-auto" style={{ fontFamily: 'Nunito, sans-serif' }}>
       <div className="w-full max-w-2xl text-center relative z-10">
         {/* Logo/Icon */}
         <motion.div
@@ -81,7 +19,7 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
         >
           {/* Main Title */}
           <motion.h1 
-            className="text-7xl mb-6" 
+            className="text-4xl sm:text-5xl md:text-7xl mb-4 sm:mb-6" 
             style={{ 
               fontFamily: 'Fredoka, sans-serif',
               color: colors.textPrimary,
@@ -96,7 +34,7 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
 
           {/* Subtitle */}
           <motion.p 
-            className="text-2xl mb-12" 
+            className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 md:mb-12" 
             style={{ color: colors.textPrimary, opacity: 0.8 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.8 }}
@@ -107,14 +45,14 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
 
           {/* Feature Cards */}
           <motion.div 
-            className="grid grid-cols-3 gap-6 mb-12"
+            className="grid grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.5 }}
           >
             {/* Card 1 */}
             <motion.div 
-              className="rounded-3xl p-8 text-center"
+              className="rounded-3xl p-4 sm:p-6 md:p-8 text-center"
               style={{ 
                 background: `linear-gradient(180deg, ${colors.skyBlueLight} 0%, ${colors.skyBlue} 100%)`,
                 boxShadow: `0 0 0 4px ${colors.skyBlueDark}, 0 5px 0 ${colors.skyBlueDark}, 0 6px 20px rgba(0,0,0,0.2)`
@@ -129,9 +67,9 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
                 delay: 0
               }}
             >
-              <div className="text-5xl mb-4">📸</div>
+              <div className="text-3xl sm:text-4xl md:text-5xl mb-2 sm:mb-3 md:mb-4">📸</div>
               <h3 
-                className="text-2xl mb-2"
+                className="text-base sm:text-lg md:text-2xl mb-1 sm:mb-2"
                 style={{ 
                   fontFamily: 'Fredoka, sans-serif',
                   color: colors.white,
@@ -141,14 +79,14 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
               >
                 Snap a Photo
               </h3>
-              <p className="text-lg" style={{ color: colors.white, opacity: 0.95, fontWeight: 600 }}>
+              <p className="text-sm sm:text-base md:text-lg" style={{ color: colors.white, opacity: 0.95, fontWeight: 600 }}>
                 Take a picture of your child's toys
               </p>
             </motion.div>
 
             {/* Card 2 */}
             <motion.div 
-              className="rounded-3xl p-8 text-center"
+              className="rounded-3xl p-4 sm:p-6 md:p-8 text-center"
               style={{ 
                 background: `linear-gradient(180deg, ${colors.yellowLight} 0%, ${colors.yellow} 100%)`,
                 boxShadow: `0 0 0 4px ${colors.yellowDark}, 0 5px 0 ${colors.yellowDark}, 0 6px 20px rgba(0,0,0,0.2)`
@@ -163,9 +101,9 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
                 delay: 0.3
               }}
             >
-              <div className="text-5xl mb-4">✨</div>
+              <div className="text-3xl sm:text-4xl md:text-5xl mb-2 sm:mb-3 md:mb-4">✨</div>
               <h3 
-                className="text-2xl mb-2"
+                className="text-base sm:text-lg md:text-2xl mb-1 sm:mb-2"
                 style={{ 
                   fontFamily: 'Fredoka, sans-serif',
                   color: colors.textPrimary,
@@ -175,14 +113,14 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
               >
                 Watch Magic
               </h3>
-              <p className="text-lg" style={{ color: colors.textPrimary, opacity: 0.85, fontWeight: 600 }}>
+              <p className="text-sm sm:text-base md:text-lg" style={{ color: colors.textPrimary, opacity: 0.85, fontWeight: 600 }}>
                 See toys become story characters
               </p>
             </motion.div>
 
             {/* Card 3 */}
             <motion.div 
-              className="rounded-3xl p-8 text-center"
+              className="rounded-3xl p-4 sm:p-6 md:p-8 text-center"
               style={{ 
                 background: `linear-gradient(180deg, ${colors.redLight} 0%, ${colors.red} 100%)`,
                 boxShadow: `0 0 0 4px ${colors.redDark}, 0 5px 0 ${colors.redDark}, 0 6px 20px rgba(0,0,0,0.2)`
@@ -197,9 +135,9 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
                 delay: 0.6
               }}
             >
-              <div className="text-5xl mb-4">📚</div>
+              <div className="text-3xl sm:text-4xl md:text-5xl mb-2 sm:mb-3 md:mb-4">📚</div>
               <h3 
-                className="text-2xl mb-2"
+                className="text-base sm:text-lg md:text-2xl mb-1 sm:mb-2"
                 style={{ 
                   fontFamily: 'Fredoka, sans-serif',
                   color: colors.white,
@@ -209,7 +147,7 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
               >
                 Read Together
               </h3>
-              <p className="text-lg" style={{ color: colors.white, opacity: 0.95, fontWeight: 600 }}>
+              <p className="text-sm sm:text-base md:text-lg" style={{ color: colors.white, opacity: 0.95, fontWeight: 600 }}>
                 Enjoy a personalized storybook
               </p>
             </motion.div>
@@ -217,7 +155,7 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
 
           {/* Info Text */}
           <motion.p 
-            className="text-xl mb-8" 
+            className="text-sm sm:text-base md:text-xl mb-4 sm:mb-6 md:mb-8" 
             style={{ color: colors.textPrimary, opacity: 0.6 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.6 }}
@@ -227,7 +165,7 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
           </motion.p>
 
           {/* Get Started Button */}
-          <div className="flex justify-center mt-8">
+          <div className="flex justify-center mt-4 sm:mt-6 md:mt-8">
             <motion.button
               onClick={onGetStarted}
               className="rounded-full px-16 py-5 cursor-pointer transition-all duration-200"

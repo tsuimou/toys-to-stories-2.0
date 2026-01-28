@@ -25,36 +25,15 @@ export function ToyNameEntry({ onContinue, onBack }: ToyNameEntryProps) {
   };
 
   return (
-    <div className="h-screen p-10 relative overflow-hidden" style={{ fontFamily: 'Nunito, sans-serif' }}>
-      {/* Floating decorative circles */}
-      <motion.div
-        className="absolute rounded-full"
-        style={{
-          width: '200px',
-          height: '200px',
-          background: withOpacity(colors.yellow, 0.12),
-          top: '25%',
-          right: '10%',
-          filter: 'blur(40px)'
-        }}
-        animate={{
-          y: [0, 30, 0],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      
+    <div className="min-h-screen p-4 sm:p-6 md:p-10 relative" style={{ fontFamily: 'Nunito, sans-serif' }}>
       {/* Back Button - Fixed position relative to viewport */}
       <BackButton onClick={onBack} />
 
-      <div className="w-full max-w-2xl mx-auto relative z-10" style={{ paddingTop: '2.5rem' }}>
+      <div className="w-full max-w-2xl mx-auto relative z-10" style={{ paddingTop: '1rem' }}>
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 
-            className="text-5xl mb-3" 
+        <div className="text-center mb-4 sm:mb-6 md:mb-8">
+          <h1
+            className="text-3xl sm:text-4xl md:text-5xl mb-3" 
             style={{ 
               fontFamily: 'Fredoka, sans-serif',
               color: colors.textPrimary,
@@ -70,7 +49,7 @@ export function ToyNameEntry({ onContinue, onBack }: ToyNameEntryProps) {
 
         {/* Input Card */}
         <motion.div 
-          className="rounded-3xl p-12 mt-12"
+          className="rounded-3xl p-6 sm:p-8 md:p-12 mt-6 sm:mt-8 md:mt-12"
           style={{ 
             backgroundColor: '#FFF8E7',
             boxShadow: `
@@ -151,8 +130,8 @@ export function ToyNameEntry({ onContinue, onBack }: ToyNameEntryProps) {
         </motion.div>
       </div>
 
-      {/* Continue Button - Fixed at bottom */}
-      <div className="absolute flex justify-center" style={{ bottom: '2.5rem', left: '2.5rem', right: '2.5rem' }}>
+      {/* Continue Button */}
+      <div className="flex justify-center" style={{ padding: '2rem 0' }}>
         <motion.button
           onClick={handleContinue}
           disabled={!toyName.trim()}

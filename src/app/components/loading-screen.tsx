@@ -55,6 +55,26 @@ export function LoadingScreen({
 
   const generateStoryContent = async () => {
     try {
+      // ============================================
+      // API DISABLED FOR UI TWEAKING
+      // Remove this block to re-enable API calls
+      // ============================================
+      console.log("API disabled for UI tweaking - using fallback story");
+      setStage("analyzing");
+      setProgress(30);
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setStage("generating");
+      setProgress(60);
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setStage("finalizing");
+      setProgress(100);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      onError("UI tweaking mode - using example story");
+      return;
+      // ============================================
+      // END API DISABLED BLOCK
+      // ============================================
+
       setStage("analyzing");
       setProgress(10);
 
@@ -134,12 +154,12 @@ export function LoadingScreen({
         pageNumber: page.pageNumber,
         text: page.text,
         imageUrl: generatedImages[index] || defaultImageUrls[index % defaultImageUrls.length],
-        vocabWords: index < 2
-          ? generatedStory.vocabulary.slice(index * 2, (index + 1) * 2).map(v => ({
-              word: v.word,
-              pronunciation: v.pronunciation,
-              definition: v.definition,
-            }))
+        vocabWords: index < 4 && generatedStory.vocabulary[index]
+          ? [{
+              word: generatedStory.vocabulary[index].word,
+              pronunciation: generatedStory.vocabulary[index].pronunciation,
+              definition: generatedStory.vocabulary[index].definition,
+            }]
           : [],
       }));
 
@@ -185,7 +205,7 @@ export function LoadingScreen({
 
   return (
     <div
-      className="h-screen flex items-center justify-center p-10 relative overflow-hidden"
+      className="h-screen flex items-center justify-center p-4 sm:p-6 md:p-10 relative overflow-hidden"
       style={{
         fontFamily: 'Nunito, sans-serif',
         backgroundColor: '#1a1a2e'
@@ -371,7 +391,7 @@ export function LoadingScreen({
                     boxShadow: 'none'
                   }}
                 >
-                  <Sparkles size={50} style={{ color: '#E8DCC8', filter: 'none' }} />
+                  <Sparkles size={50} style={{ color: colors.royalBlue, filter: 'none' }} />
                 </div>
               </motion.div>
 

@@ -34,7 +34,7 @@ export function VocabularyReview({ vocabularyWords, onDownloadPdf, onStartOver, 
 
   return (
     <div 
-      className="h-screen flex items-center justify-center p-10 relative overflow-hidden" 
+      className="h-screen flex items-center justify-center p-4 sm:p-6 md:p-10 relative overflow-y-auto" 
       style={{ 
         fontFamily: 'Nunito, sans-serif',
         backgroundColor: '#1a1a2e'
@@ -96,11 +96,11 @@ export function VocabularyReview({ vocabularyWords, onDownloadPdf, onStartOver, 
 
       <div className="w-full max-w-5xl relative z-10">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-6 sm:mb-8 md:mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Star size={40} style={{ color: '#6DD5A7' }} fill="#6DD5A7" />
-            <h1 
-              className="text-5xl"
+            <h1
+              className="text-3xl sm:text-4xl md:text-5xl"
               style={{ 
                 fontFamily: 'Fredoka, sans-serif',
                 color: colors.white,
@@ -114,11 +114,11 @@ export function VocabularyReview({ vocabularyWords, onDownloadPdf, onStartOver, 
         </div>
 
         {/* Vocabulary Grid */}
-        <div className="grid grid-cols-2 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8 md:mb-12">
           {vocabularyWords.map((vocab, index) => (
             <motion.div
               key={vocab.word}
-              className="bg-white rounded-3xl p-8"
+              className="bg-white rounded-3xl p-4 sm:p-6 md:p-8"
               style={{ 
                 boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
               }}
@@ -185,7 +185,7 @@ export function VocabularyReview({ vocabularyWords, onDownloadPdf, onStartOver, 
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-center gap-6">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 pb-4">
           <motion.button
             onClick={onDownloadPdf}
             className="rounded-3xl px-10 py-5 flex items-center gap-3 transition-all"

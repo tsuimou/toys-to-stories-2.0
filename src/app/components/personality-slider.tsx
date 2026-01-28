@@ -44,36 +44,15 @@ export function PersonalitySlider({ onContinue, onBack, toyName }: PersonalitySl
   };
 
   return (
-    <div className="h-screen p-10 relative overflow-hidden" style={{ fontFamily: 'Nunito, sans-serif' }}>
-      {/* Floating decorative circles */}
-      <motion.div
-        className="absolute rounded-full"
-        style={{
-          width: '180px',
-          height: '180px',
-          background: withOpacity(colors.lavender, 0.15),
-          bottom: '20%',
-          right: '12%',
-          filter: 'blur(40px)'
-        }}
-        animate={{
-          y: [0, -20, 0],
-        }}
-        transition={{
-          duration: 7,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      
+    <div className="min-h-screen p-4 sm:p-6 md:p-10 relative" style={{ fontFamily: 'Nunito, sans-serif' }}>
       {/* Back Button */}
       <BackButton onClick={onBack} />
 
-      <div className="w-full max-w-2xl mx-auto relative z-10" style={{ paddingTop: '2.5rem' }}>
+      <div className="w-full max-w-2xl mx-auto relative z-10" style={{ paddingTop: '1rem' }}>
         {/* Header */}
         <div className="text-center mb-8">
           <h1 
-            className="text-5xl mb-3" 
+            className="text-3xl sm:text-4xl md:text-5xl mb-3"
             style={{ 
               fontFamily: 'Fredoka, sans-serif',
               color: colors.textPrimary,
@@ -89,7 +68,7 @@ export function PersonalitySlider({ onContinue, onBack, toyName }: PersonalitySl
 
         {/* Personality Card */}
         <motion.div 
-          className="rounded-3xl p-12 mt-12"
+          className="rounded-3xl p-6 sm:p-8 md:p-12 mt-6 sm:mt-8 md:mt-12"
           style={{ 
             backgroundColor: '#FFF8E7',
             borderRadius: '32px',
@@ -105,9 +84,9 @@ export function PersonalitySlider({ onContinue, onBack, toyName }: PersonalitySl
           animate={{ opacity: 1, y: 0 }}
         >
           {/* Energy Level Slider */}
-          <div className="mb-16">
-            <h3 
-              className="text-2xl mb-8" 
+          <div className="mb-6 sm:mb-10">
+            <h3
+              className="text-xl sm:text-2xl mb-4 sm:mb-6" 
               style={{ 
                 fontFamily: 'Fredoka, sans-serif',
                 color: colors.textPrimary,
@@ -167,9 +146,9 @@ export function PersonalitySlider({ onContinue, onBack, toyName }: PersonalitySl
 
           {/* Confidence Slider */}
           <div>
-            <h3 
-              className="text-2xl mb-8" 
-              style={{ 
+            <h3
+              className="text-xl sm:text-2xl mb-4 sm:mb-6"
+              style={{
                 fontFamily: 'Fredoka, sans-serif',
                 color: colors.textPrimary,
                 fontWeight: 600
@@ -228,102 +207,104 @@ export function PersonalitySlider({ onContinue, onBack, toyName }: PersonalitySl
         </motion.div>
       </div>
 
-      {/* Continue Button - Fixed at bottom */}
-      <div className="absolute flex justify-center" style={{ bottom: '2.5rem', left: '2.5rem', right: '2.5rem' }}>
+      {/* Continue Button */}
+      <div className="flex justify-center" style={{ padding: '2rem 0', zIndex: 10 }}>
         <div className="relative">
-          {/* Magical sparkle particles floating around button */}
-          {[...Array(6)].map((_, i) => (
+            {/* Magical sparkle particles floating around button */}
+            {[...Array(6)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute rounded-full"
+                style={{
+                  width: i % 2 === 0 ? '8px' : '6px',
+                  height: i % 2 === 0 ? '8px' : '6px',
+                  background: 'radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 210, 63, 0.8) 100%)',
+                  boxShadow: '0 0 8px rgba(255, 210, 63, 0.8)',
+                  left: `${-20 + Math.cos((i * Math.PI * 2) / 6) * 140}px`,
+                  top: `${20 + Math.sin((i * Math.PI * 2) / 6) * 30}px`,
+                }}
+                animate={{
+                  y: [0, -15, 0],
+                  opacity: [0.4, 1, 0.4],
+                  scale: [0.8, 1.2, 0.8],
+                }}
+                transition={{
+                  duration: 2 + i * 0.3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: i * 0.2,
+                }}
+              />
+            ))}
+
+            {/* Glowing aura behind button */}
             <motion.div
-              key={i}
-              className="absolute rounded-full"
+              className="absolute inset-0 rounded-full"
               style={{
-                width: i % 2 === 0 ? '8px' : '6px',
-                height: i % 2 === 0 ? '8px' : '6px',
-                background: 'radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 210, 63, 0.8) 100%)',
-                boxShadow: '0 0 8px rgba(255, 210, 63, 0.8)',
-                left: `${-20 + Math.cos((i * Math.PI * 2) / 6) * 140}px`,
-                top: `${20 + Math.sin((i * Math.PI * 2) / 6) * 30}px`,
+                background: `radial-gradient(circle, ${withOpacity(colors.primary, 0.4)} 0%, transparent 70%)`,
+                filter: 'blur(20px)',
+                transform: 'scale(1.2)',
               }}
               animate={{
-                y: [0, -15, 0],
-                opacity: [0.4, 1, 0.4],
-                scale: [0.8, 1.2, 0.8],
+                opacity: [0.5, 0.8, 0.5],
+                scale: [1.2, 1.3, 1.2],
               }}
               transition={{
-                duration: 2 + i * 0.3,
+                duration: 2,
                 repeat: Infinity,
                 ease: "easeInOut",
-                delay: i * 0.2,
               }}
             />
-          ))}
 
-          {/* Glowing aura behind button */}
-          <motion.div
-            className="absolute inset-0 rounded-full"
-            style={{
-              background: `radial-gradient(circle, ${withOpacity(colors.primary, 0.4)} 0%, transparent 70%)`,
-              filter: 'blur(20px)',
-              transform: 'scale(1.2)',
-            }}
-            animate={{
-              opacity: [0.5, 0.8, 0.5],
-              scale: [1.2, 1.3, 1.2],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-
-          {/* Main Button with shimmer effect */}
-          <motion.button
-            onClick={handleNext}
-            className="relative overflow-hidden rounded-full px-16 py-5 cursor-pointer transition-all duration-200"
-            style={{ 
-              background: `linear-gradient(180deg, ${colors.primaryLight} 0%, ${colors.primary} 100%)`,
-              color: colors.white,
-              fontSize: '20px',
-              fontFamily: 'Fredoka, sans-serif',
-              fontWeight: 700,
-              boxShadow: `0 0 0 5px ${colors.primaryDark}, 0 6px 0 ${colors.primaryDark}, 0 8px 20px rgba(0,0,0,0.3)`,
-              border: 'none',
-              textShadow: `2px 2px 0 ${colors.primaryDark}, -1px -1px 0 ${colors.primaryDark}, 1px -1px 0 ${colors.primaryDark}, -1px 1px 0 ${colors.primaryDark}`
-            }}
-            whileHover={{ 
-              scale: 1.05, 
-              boxShadow: `0 0 0 5px ${colors.primaryDark}, 0 8px 0 ${colors.primaryDark}, 0 10px 25px rgba(0,0,0,0.35)`
-            }}
-            whileTap={{ 
-              scale: 0.95,
-              boxShadow: `0 0 0 5px ${colors.primaryDark}, 0 2px 0 ${colors.primaryDark}, 0 4px 10px rgba(0,0,0,0.3)`,
-              translateY: 4
-            }}
-          >
-            {/* Shimmer overlay effect */}
-            <motion.div
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%)',
-                backgroundSize: '200% 100%',
-                borderRadius: '9999px',
+            {/* Main Button with shimmer effect */}
+            <motion.button
+              onClick={handleNext}
+              className="relative overflow-hidden rounded-full px-16 py-5 cursor-pointer transition-all duration-200"
+              style={{ 
+                background: `linear-gradient(180deg, ${colors.primaryLight} 0%, ${colors.primary} 100%)`,
+                color: colors.white,
+                fontSize: '20px',
+                fontFamily: 'Fredoka, sans-serif',
+                fontWeight: 700,
+                boxShadow: `0 0 0 5px ${colors.primaryDark}, 0 6px 0 ${colors.primaryDark}, 0 8px 20px rgba(0,0,0,0.3)`,
+                border: 'none',
+                textShadow: `2px 2px 0 ${colors.primaryDark}, -1px -1px 0 ${colors.primaryDark}, 1px -1px 0 ${colors.primaryDark}, -1px 1px 0 ${colors.primaryDark}`,
+                position: 'relative',
+                zIndex: 1
               }}
-              animate={{
-                backgroundPosition: ['-200% 0%', '200% 0%'],
+              whileHover={{ 
+                scale: 1.05, 
+                boxShadow: `0 0 0 5px ${colors.primaryDark}, 0 8px 0 ${colors.primaryDark}, 0 10px 25px rgba(0,0,0,0.35)`
               }}
-              transition={{
-                duration: 2.5,
-                repeat: Infinity,
-                ease: "linear",
+              whileTap={{ 
+                scale: 0.95,
+                boxShadow: `0 0 0 5px ${colors.primaryDark}, 0 2px 0 ${colors.primaryDark}, 0 4px 10px rgba(0,0,0,0.3)`,
+                translateY: 4
               }}
-            />
-            
-            {/* Button text with subtle glow */}
-            <span className="relative z-10">
-              ✨ Generate Story ✨
-            </span>
-          </motion.button>
+            >
+              {/* Shimmer overlay effect */}
+              <motion.div
+                className="absolute inset-0"
+                style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%)',
+                  backgroundSize: '200% 100%',
+                  borderRadius: '9999px',
+                }}
+                animate={{
+                  backgroundPosition: ['-200% 0%', '200% 0%'],
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+              />
+              
+              {/* Button text with subtle glow */}
+              <span className="relative z-10 inline-block">
+                ✨ Generate Story ✨
+              </span>
+            </motion.button>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, forwardRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import HTMLFlipBook from "react-pageflip";
 import { ChevronLeft, ChevronRight, Volume2, Download, X } from "lucide-react";
 import { colors } from "@/utils/colors";
 
@@ -22,10 +23,36 @@ interface StorybookReaderProps {
   onComplete: () => void;
 }
 
+// Individual page component - must use forwardRef for react-pageflip
+const Page = forwardRef<HTMLDivElement, {
+  children: React.ReactNode;
+  pageNumber?: number;
+  isImagePage?: boolean;
+}>(({ children, pageNumber, isImagePage }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className="page"
+      style={{
+        backgroundColor: isImagePage ? '#2a2a40' : '#FFF8E7',
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        borderRadius: '8px',
+      }}
+    >
+      {children}
+    </div>
+  );
+});
+
+Page.displayName = 'Page';
+
 export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderProps) {
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedVocab, setSelectedVocab] = useState<VocabWord | null>(null);
   const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
+  const flipBookRef = useRef<any>(null);
 
   // Generate consistent star positions that don't change between pages
   const stars = useMemo(() => {
@@ -38,7 +65,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
       duration: 12 + Math.random() * 8,
       delay: Math.random() * 10,
     }));
-  }, []); // Empty dependency array means this only runs once
+  }, []);
 
   // Close vocab popup when page changes
   useEffect(() => {
@@ -46,16 +73,27 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
   }, [currentPage]);
 
   const handleNextPage = () => {
-    if (currentPage < pages.length - 1) {
-      setCurrentPage(currentPage + 1);
-    } else {
-      onComplete();
+    if (flipBookRef.current) {
+      flipBookRef.current.pageFlip().flipNext();
     }
   };
 
   const handlePrevPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
+    if (flipBookRef.current) {
+      flipBookRef.current.pageFlip().flipPrev();
+    }
+  };
+
+  const onFlip = (e: any) => {
+    const newPage = Math.floor(e.data / 2);
+    setCurrentPage(newPage);
+
+    // Check if we've reached the last page
+    if (e.data >= pages.length * 2 - 1) {
+      // Small delay before triggering complete
+      setTimeout(() => {
+        onComplete();
+      }, 500);
     }
   };
 
@@ -67,17 +105,15 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
     vocabWords.forEach((vocab, idx) => {
       const index = result.toLowerCase().indexOf(vocab.word.toLowerCase(), lastIndex);
       if (index !== -1) {
-        // Add text before vocab word
         if (index > lastIndex) {
           parts.push(<span key={`text-${idx}`}>{result.substring(lastIndex, index)}</span>);
         }
-        
-        // Add vocab word as clickable with toy block styling
+
         parts.push(
           <span
             key={`vocab-${idx}`}
             className="rounded-lg cursor-pointer transition-all hover:scale-105"
-            style={{ 
+            style={{
               backgroundColor: colors.skyBlue,
               padding: '4px 10px',
               display: 'inline-block',
@@ -91,17 +127,19 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
               fontWeight: 700,
               textShadow: `1px 1px 0 ${colors.primaryDark}`
             }}
-            onClick={() => setSelectedVocab(vocab)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedVocab(vocab);
+            }}
           >
             {result.substring(index, index + vocab.word.length)}
           </span>
         );
-        
+
         lastIndex = index + vocab.word.length;
       }
     });
 
-    // Add remaining text
     if (lastIndex < result.length) {
       parts.push(<span key="text-end">{result.substring(lastIndex)}</span>);
     }
@@ -109,12 +147,80 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
     return parts;
   };
 
-  const currentPageData = pages[currentPage];
+  // Create pages array for flipbook - each story page becomes 2 flipbook pages (image + text)
+  // Enforce max 1 vocab word per page, max 4 total across the story
+  const flipbookPages = useMemo(() => {
+    const result: React.ReactNode[] = [];
+    let totalVocabUsed = 0;
+
+    pages.forEach((page, index) => {
+      // Limit vocab: max 1 per page, max 4 total
+      const remaining = Math.max(0, 4 - totalVocabUsed);
+      const limitedVocab = page.vocabWords.slice(0, Math.min(1, remaining));
+      totalVocabUsed += limitedVocab.length;
+
+      // Left page - Image
+      result.push(
+        <Page key={`image-${index}`} pageNumber={index * 2} isImagePage>
+          <div className="w-full h-full p-4">
+            <img
+              src={page.imageUrl}
+              alt={`Page ${index + 1} illustration`}
+              className="w-full h-full object-cover"
+              style={{ borderRadius: '12px' }}
+            />
+          </div>
+        </Page>
+      );
+
+      // Right page - Text
+      result.push(
+        <Page key={`text-${index}`} pageNumber={index * 2 + 1}>
+          <div
+            className="w-full h-full p-6 sm:p-8 flex flex-col justify-center"
+            style={{ backgroundColor: '#FFF8E7' }}
+          >
+            <p
+              className="leading-relaxed"
+              style={{
+                fontSize: 'clamp(16px, 2vw, 22px)',
+                lineHeight: '1.8',
+                color: colors.textPrimary,
+                fontFamily: 'Fredoka, sans-serif',
+                fontWeight: 600
+              }}
+            >
+              {renderTextWithVocab(page.text, limitedVocab)}
+            </p>
+
+            {/* Page number */}
+            <div
+              className="absolute bottom-4 right-6"
+              style={{
+                fontFamily: 'Fredoka, sans-serif',
+                color: colors.textPrimary,
+                opacity: 0.5,
+                fontSize: '14px',
+                fontWeight: 600
+              }}
+            >
+              {index + 1}
+            </div>
+          </div>
+        </Page>
+      );
+    });
+
+    return result;
+  }, [pages]);
+
+  const totalFlipPages = pages.length * 2;
+  const displayPage = Math.floor(currentPage) + 1;
 
   return (
-    <div 
-      className="h-screen p-4 sm:p-6 md:p-10 relative overflow-hidden flex items-center justify-center" 
-      style={{ 
+    <div
+      className="h-screen p-4 sm:p-6 md:p-10 relative overflow-hidden flex items-center justify-center"
+      style={{
         fontFamily: 'Nunito, sans-serif',
         backgroundColor: '#1a1a2e'
       }}
@@ -129,7 +235,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
             left: `${star.left}%`,
             top: `${star.top}%`,
           }}
-          animate={{ 
+          animate={{
             opacity: [0.5, 0.8, 0.5],
             scale: [0.95, 1.05, 0.95],
           }}
@@ -164,11 +270,11 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
         🌙
       </motion.div>
 
-      {/* Top Bar - Fixed at top */}
+      {/* Top Bar */}
       <div className="fixed top-4 sm:top-6 left-0 right-0 flex justify-between items-center w-full px-4 sm:px-6 md:px-10 z-20 max-w-7xl mx-auto">
         <motion.button
           className="rounded-2xl p-3 sm:p-4 transition-all flex items-center justify-center"
-          style={{ 
+          style={{
             background: `linear-gradient(180deg, ${colors.yellow} 0%, #E8C700 100%)`,
             boxShadow: `
               0 0 0 4px #C4A200,
@@ -179,7 +285,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
           }}
           onClick={() => alert('Narration would play here!')}
           aria-label="Play narration"
-          whileHover={{ 
+          whileHover={{
             scale: 1.05,
             boxShadow: `
               0 0 0 4px #C4A200,
@@ -187,7 +293,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
               0 9px 18px rgba(0,0,0,0.35)
             `
           }}
-          whileTap={{ 
+          whileTap={{
             scale: 0.95,
             boxShadow: `
               0 0 0 4px #C4A200,
@@ -203,7 +309,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
         <div className="flex gap-3 sm:gap-4">
           <motion.button
             className="rounded-2xl p-3 sm:p-4 transition-all flex items-center justify-center"
-            style={{ 
+            style={{
               background: `linear-gradient(180deg, #A78BFA 0%, #8B5CF6 100%)`,
               boxShadow: `
                 0 0 0 4px #7C3AED,
@@ -213,7 +319,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
               border: 'none'
             }}
             onClick={() => alert('PDF download would start here!')}
-            whileHover={{ 
+            whileHover={{
               scale: 1.05,
               boxShadow: `
                 0 0 0 4px #7C3AED,
@@ -221,7 +327,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                 0 9px 18px rgba(0,0,0,0.35)
               `
             }}
-            whileTap={{ 
+            whileTap={{
               scale: 0.95,
               boxShadow: `
                 0 0 0 4px #7C3AED,
@@ -235,7 +341,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
           </motion.button>
           <motion.button
             className="rounded-2xl p-3 sm:p-4 transition-all flex items-center justify-center"
-            style={{ 
+            style={{
               background: `linear-gradient(180deg, #FF6B6B 0%, #EE5A52 100%)`,
               boxShadow: `
                 0 0 0 4px #DC2626,
@@ -245,7 +351,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
               border: 'none'
             }}
             onClick={() => setShowCloseConfirmation(true)}
-            whileHover={{ 
+            whileHover={{
               scale: 1.05,
               boxShadow: `
                 0 0 0 4px #DC2626,
@@ -253,7 +359,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                 0 9px 18px rgba(0,0,0,0.35)
               `
             }}
-            whileTap={{ 
+            whileTap={{
               scale: 0.95,
               boxShadow: `
                 0 0 0 4px #DC2626,
@@ -268,100 +374,70 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
         </div>
       </div>
 
-      {/* Main content container - centered with proper spacing */}
-      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 z-10" style={{ 
-        marginTop: '80px',
-        marginBottom: '80px',
-        maxWidth: '1200px'
-      }}>
-        {/* Book Pages - Responsive */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentPage}
-            className="overflow-hidden grid grid-cols-1 lg:grid-cols-2 gap-0 mx-auto relative"
-            style={{ 
-              backgroundColor: '#FFF8E7',
-              borderRadius: '32px',
-              boxShadow: `
-                inset 0 0 0 10px ${colors.sunnyYellow},
-                inset 0 0 0 14px #FFF8E7,
-                0 0 0 6px #D4B800, 
-                0 10px 0 #D4B800, 
-                0 12px 40px rgba(0,0,0,0.4)
-              `,
-              width: '100%',
-              height: 'clamp(500px, 60vh, 700px)',
-              transformStyle: 'preserve-3d',
-              perspective: '2000px'
-            }}
-            initial={{ 
-              opacity: 0, 
-              rotateY: -90,
-              transformOrigin: 'center center'
-            }}
-            animate={{ 
-              opacity: 1, 
-              rotateY: 0,
-              transformOrigin: 'center center'
-            }}
-            exit={{ 
-              opacity: 0, 
-              rotateY: 90,
-              transformOrigin: 'center center'
-            }}
-            transition={{ 
-              duration: 0.8,
-              ease: [0.43, 0.13, 0.23, 0.96]
-            }}
+      {/* Flipbook Container */}
+      <div
+        className="relative z-10"
+        style={{
+          marginTop: '60px',
+          marginBottom: '60px',
+        }}
+      >
+        {/* Book wrapper with spine and cover styling */}
+        <div
+          style={{
+            padding: '20px',
+            background: `linear-gradient(90deg, #8B4513 0%, #A0522D 5%, #DEB887 6%, #FFF8E7 10%, #FFF8E7 90%, #DEB887 94%, #A0522D 95%, #8B4513 100%)`,
+            borderRadius: '8px 16px 16px 8px',
+            boxShadow: `
+              0 0 0 4px #5D3A1A,
+              0 10px 0 #5D3A1A,
+              0 12px 40px rgba(0,0,0,0.5),
+              inset 0 0 30px rgba(0,0,0,0.1)
+            `,
+          }}
+        >
+          {/* @ts-ignore - react-pageflip types are incomplete */}
+          <HTMLFlipBook
+            ref={flipBookRef}
+            width={400}
+            height={500}
+            size="stretch"
+            minWidth={300}
+            maxWidth={500}
+            minHeight={400}
+            maxHeight={600}
+            maxShadowOpacity={0.5}
+            showCover={false}
+            mobileScrollSupport={true}
+            onFlip={onFlip}
+            className="storybook-flipbook"
+            style={{}}
+            startPage={0}
+            drawShadow={true}
+            flippingTime={800}
+            usePortrait={false}
+            startZIndex={0}
+            autoSize={true}
+            clickEventForward={true}
+            useMouseEvents={true}
+            swipeDistance={30}
+            showPageCorners={true}
+            disableFlipByClick={true}
           >
-            {/* Left Side - Illustration */}
-            <div 
-              className="relative overflow-hidden order-2 lg:order-1"
-              style={{ 
-                backgroundColor: '#2a2a40',
-                minHeight: '400px',
-                borderRadius: '24px',
-                margin: '16px'
-              }}
-            >
-              <img 
-                src={currentPageData.imageUrl}
-                alt={`Page ${currentPage + 1} illustration`}
-                className="w-full h-full object-cover"
-                style={{ borderRadius: '24px' }}
-              />
-            </div>
-
-            {/* Right Side - Text */}
-            <div className="p-8 sm:p-10 md:p-12 flex flex-col justify-between order-1 lg:order-2" style={{ backgroundColor: '#FFF8E7' }}>
-              <div>
-                <p 
-                  className="leading-relaxed"
-                  style={{ 
-                    fontSize: 'clamp(18px, 2.2vw, 26px)',
-                    lineHeight: '1.8',
-                    color: colors.textPrimary,
-                    fontFamily: 'Fredoka, sans-serif',
-                    fontWeight: 600
-                  }}
-                >
-                  {renderTextWithVocab(currentPageData.text, currentPageData.vocabWords)}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+            {flipbookPages}
+          </HTMLFlipBook>
+        </div>
       </div>
 
-      {/* Navigation Arrows - Fixed at bottom */}
+      {/* Navigation */}
       <div className="fixed bottom-4 sm:bottom-6 left-0 right-0 flex justify-between items-center w-full px-4 sm:px-6 md:px-10 z-20 max-w-7xl mx-auto">
         <motion.button
           onClick={handlePrevPage}
           disabled={currentPage === 0}
           className="rounded-2xl p-3 sm:p-4 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
-          style={{ 
-            background: currentPage === 0 
-              ? '#9CA3AF' 
+          style={{
+            background: currentPage === 0
+              ? '#9CA3AF'
               : `linear-gradient(180deg, ${colors.royalBlue} 0%, #2563C7 100%)`,
             color: colors.white,
             boxShadow: currentPage === 0
@@ -374,7 +450,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
             border: 'none',
             cursor: currentPage === 0 ? 'not-allowed' : 'pointer'
           }}
-          whileHover={currentPage === 0 ? {} : { 
+          whileHover={currentPage === 0 ? {} : {
             scale: 1.05,
             boxShadow: `
               0 0 0 4px #1E4A8F,
@@ -382,7 +458,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
               0 9px 18px rgba(0,0,0,0.35)
             `
           }}
-          whileTap={currentPage === 0 ? {} : { 
+          whileTap={currentPage === 0 ? {} : {
             scale: 0.95,
             boxShadow: `
               0 0 0 4px #1E4A8F,
@@ -395,10 +471,10 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
           <ChevronLeft size={32} style={{ filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.3))' }} />
         </motion.button>
 
-        {/* Page Counter - Between navigation arrows */}
-        <div 
-          className="rounded-2xl px-6 py-3" 
-          style={{ 
+        {/* Page Counter */}
+        <div
+          className="rounded-2xl px-6 py-3"
+          style={{
             backgroundColor: '#FFF8E7',
             color: colors.textPrimary,
             fontFamily: 'Fredoka, sans-serif',
@@ -412,13 +488,13 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
             border: 'none'
           }}
         >
-          Page {currentPage + 1} of {pages.length}
+          Page {displayPage} of {pages.length}
         </div>
 
         <motion.button
           onClick={handleNextPage}
           className="rounded-2xl p-3 sm:p-4 transition-all flex items-center justify-center"
-          style={{ 
+          style={{
             background: `linear-gradient(180deg, ${colors.royalBlue} 0%, #2563C7 100%)`,
             color: colors.white,
             boxShadow: `
@@ -428,7 +504,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
             `,
             border: 'none'
           }}
-          whileHover={{ 
+          whileHover={{
             scale: 1.05,
             boxShadow: `
               0 0 0 4px #1E4A8F,
@@ -436,7 +512,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
               0 9px 18px rgba(0,0,0,0.35)
             `
           }}
-          whileTap={{ 
+          whileTap={{
             scale: 0.95,
             boxShadow: `
               0 0 0 4px #1E4A8F,
@@ -454,8 +530,8 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
       <AnimatePresence>
         {selectedVocab && (
           <motion.div
-            className="absolute rounded-3xl p-8 shadow-lg"
-            style={{ 
+            className="fixed rounded-3xl p-8 shadow-lg"
+            style={{
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
@@ -466,8 +542,8 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
               boxShadow: `
                 inset 0 0 0 6px #4CAF50,
                 inset 0 0 0 10px #FFF8E7,
-                0 0 0 4px #2E7D32, 
-                0 6px 0 #2E7D32, 
+                0 0 0 4px #2E7D32,
+                0 6px 0 #2E7D32,
                 0 8px 25px rgba(0,0,0,0.4)
               `,
               zIndex: 50
@@ -480,7 +556,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
             <motion.button
               onClick={() => setSelectedVocab(null)}
               className="absolute rounded-xl flex items-center justify-center"
-              style={{ 
+              style={{
                 top: '12px',
                 right: '12px',
                 width: '36px',
@@ -495,7 +571,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                 border: 'none',
                 cursor: 'pointer'
               }}
-              whileHover={{ 
+              whileHover={{
                 scale: 1.1,
                 boxShadow: `
                   0 0 0 2px #B02D38,
@@ -503,7 +579,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                   0 5px 12px rgba(0,0,0,0.35)
                 `
               }}
-              whileTap={{ 
+              whileTap={{
                 scale: 0.95,
                 boxShadow: `
                   0 0 0 2px #B02D38,
@@ -516,9 +592,9 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
               <X size={18} style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }} />
             </motion.button>
 
-            <h3 
+            <h3
               className="text-3xl mb-3"
-              style={{ 
+              style={{
                 fontFamily: 'Fredoka, sans-serif',
                 color: colors.textPrimary,
                 fontWeight: 700
@@ -526,10 +602,10 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
             >
               {selectedVocab.word}
             </h3>
-            
-            <p 
+
+            <p
               className="text-lg mb-4 italic"
-              style={{ 
+              style={{
                 color: '#9B7EDE',
                 fontFamily: 'Fredoka, sans-serif',
                 fontWeight: 600
@@ -537,11 +613,11 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
             >
               {selectedVocab.pronunciation}
             </p>
-            
-            <p 
+
+            <p
               className="text-base mb-6"
-              style={{ 
-                color: colors.textPrimary, 
+              style={{
+                color: colors.textPrimary,
                 lineHeight: '1.6',
                 fontFamily: 'Fredoka, sans-serif',
                 fontWeight: 600
@@ -552,7 +628,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
 
             <motion.button
               className="rounded-2xl p-3 transition-all flex items-center justify-center"
-              style={{ 
+              style={{
                 background: `linear-gradient(180deg, ${colors.sunnyYellow} 0%, #D4B800 100%)`,
                 boxShadow: `
                   0 0 0 3px #A89200,
@@ -563,7 +639,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                 cursor: 'pointer'
               }}
               onClick={() => alert('Pronunciation would play here!')}
-              whileHover={{ 
+              whileHover={{
                 scale: 1.05,
                 boxShadow: `
                   0 0 0 3px #A89200,
@@ -571,7 +647,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                   0 7px 18px rgba(0,0,0,0.35)
                 `
               }}
-              whileTap={{ 
+              whileTap={{
                 scale: 0.95,
                 boxShadow: `
                   0 0 0 3px #A89200,
@@ -591,7 +667,6 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
       <AnimatePresence>
         {showCloseConfirmation && (
           <>
-            {/* Backdrop */}
             <motion.div
               className="fixed inset-0 bg-black"
               style={{ zIndex: 60 }}
@@ -600,11 +675,10 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
               exit={{ opacity: 0 }}
               onClick={() => setShowCloseConfirmation(false)}
             />
-            
-            {/* Confirmation Modal */}
-            <div 
+
+            <div
               className="fixed"
-              style={{ 
+              style={{
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
@@ -613,7 +687,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
             >
               <motion.div
                 className="rounded-3xl p-10 shadow-lg"
-                style={{ 
+                style={{
                   maxWidth: '90vw',
                   width: '520px',
                   backgroundColor: '#FFF8E7',
@@ -621,8 +695,8 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                   boxShadow: `
                     inset 0 0 0 8px ${colors.vibrantRed},
                     inset 0 0 0 12px #FFF8E7,
-                    0 0 0 6px #B02D38, 
-                    0 8px 0 #B02D38, 
+                    0 0 0 6px #B02D38,
+                    0 8px 0 #B02D38,
                     0 10px 35px rgba(0,0,0,0.5)
                   `
                 }}
@@ -631,9 +705,9 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.3 }}
               >
-                <h3 
+                <h3
                   className="text-4xl mb-5"
-                  style={{ 
+                  style={{
                     fontFamily: 'Fredoka, sans-serif',
                     color: colors.textPrimary,
                     textAlign: 'center',
@@ -642,11 +716,11 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                 >
                   Are you sure?
                 </h3>
-                
-                <p 
+
+                <p
                   className="text-xl mb-8"
-                  style={{ 
-                    color: colors.textPrimary, 
+                  style={{
+                    color: colors.textPrimary,
                     lineHeight: '1.6',
                     textAlign: 'center',
                     fontFamily: 'Fredoka, sans-serif',
@@ -661,7 +735,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                   <motion.button
                     onClick={() => setShowCloseConfirmation(false)}
                     className="rounded-full px-10 py-4 transition-all"
-                    style={{ 
+                    style={{
                       background: `linear-gradient(180deg, #EFEFEF 0%, #D1D1D1 100%)`,
                       color: colors.textPrimary,
                       fontSize: '20px',
@@ -677,7 +751,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                       cursor: 'pointer',
                       textShadow: '1px 1px 0 rgba(255,255,255,0.5)'
                     }}
-                    whileHover={{ 
+                    whileHover={{
                       scale: 1.05,
                       boxShadow: `
                         0 0 0 4px #A0A0A0,
@@ -685,7 +759,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                         0 8px 18px rgba(0,0,0,0.35)
                       `
                     }}
-                    whileTap={{ 
+                    whileTap={{
                       scale: 0.95,
                       boxShadow: `
                         0 0 0 4px #A0A0A0,
@@ -697,14 +771,14 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                   >
                     Cancel
                   </motion.button>
-                  
+
                   <motion.button
                     onClick={() => {
                       setShowCloseConfirmation(false);
                       onClose();
                     }}
                     className="rounded-full px-10 py-4 transition-all"
-                    style={{ 
+                    style={{
                       background: '#E63946',
                       color: colors.white,
                       fontSize: '20px',
@@ -720,7 +794,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                       cursor: 'pointer',
                       textShadow: `1px 1px 2px rgba(0,0,0,0.3)`
                     }}
-                    whileHover={{ 
+                    whileHover={{
                       scale: 1.05,
                       boxShadow: `
                         0 0 0 4px #B02D38,
@@ -728,7 +802,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                         0 8px 18px rgba(0,0,0,0.35)
                       `
                     }}
-                    whileTap={{ 
+                    whileTap={{
                       scale: 0.95,
                       boxShadow: `
                         0 0 0 4px #B02D38,
@@ -746,6 +820,19 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
           </>
         )}
       </AnimatePresence>
+
+      {/* Custom styles for flipbook */}
+      <style>{`
+        .storybook-flipbook {
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+        .storybook-flipbook .page {
+          background-color: #FFF8E7;
+        }
+        .storybook-flipbook .page-wrapper {
+          perspective: 2000px;
+        }
+      `}</style>
     </div>
   );
 }

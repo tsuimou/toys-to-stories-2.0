@@ -34,11 +34,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "valiente",
             pronunciation: "va-lien-te",
             definition: "Alguien que no tiene miedo y tiene coraje para hacer cosas difíciles."
-          },
-          {
-            word: "acogedor",
-            pronunciation: "a-co-ge-dor",
-            definition: "Cálido, cómodo y que te hace sentir seguro y feliz."
           }
         ]
       },
@@ -51,11 +46,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "misterioso",
             pronunciation: "mis-te-rio-so",
             definition: "Algo extraño e interesante sobre lo que quieres aprender más."
-          },
-          {
-            word: "asombro",
-            pronunciation: "a-som-bro",
-            definition: "Un sentimiento de sorpresa y admiración por algo hermoso o especial."
           }
         ]
       },
@@ -63,13 +53,25 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         pageNumber: 3,
         text: "En el bosque, Benny conoció nuevos amigos - bloques que podían construir cualquier cosa y un sabio dinosaurio viejo que contaba historias increíbles.",
         imageUrl: imageUrls.blocks,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "increíbles",
+            pronunciation: "in-cre-í-bles",
+            definition: "Tan sorprendentes y maravillosos que es difícil de creer."
+          }
+        ]
       },
       {
         pageNumber: 4,
         text: "Juntos, construyeron un puente arcoíris mágico que brillaba bajo la luz del sol. Benny aprendió que la amistad hace que cada aventura sea especial.",
         imageUrl: imageUrls.rainbow,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "amistad",
+            pronunciation: "a-mis-tad",
+            definition: "El cariño y conexión especial que compartes con tus amigos."
+          }
+        ]
       },
       {
         pageNumber: 5,
@@ -92,9 +94,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🦁"
       },
       {
-        word: "acogedor",
-        pronunciation: "a-co-ge-dor",
-        definition: "Cálido, cómodo y que te hace sentir seguro y feliz.",
+        word: "increíbles",
+        pronunciation: "in-cre-í-bles",
+        definition: "Tan sorprendentes y maravillosos que es difícil de creer.",
         icon: "🏠"
       },
       {
@@ -104,9 +106,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🔍"
       },
       {
-        word: "asombro",
-        pronunciation: "a-som-bro",
-        definition: "Un sentimiento de sorpresa y admiración por algo hermoso o especial.",
+        word: "amistad",
+        pronunciation: "a-mis-tad",
+        definition: "El cariño y conexión especial que compartes con tus amigos.",
         icon: "✨"
       }
     ]
@@ -122,11 +124,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "courageux",
             pronunciation: "ku-ra-jø",
             definition: "Quelqu'un qui n'a pas peur et a le courage de faire des choses difficiles."
-          },
-          {
-            word: "confortable",
-            pronunciation: "kɔ̃-fɔr-tabl",
-            definition: "Chaud, agréable et qui te fait sentir en sécurité et heureux."
           }
         ]
       },
@@ -139,11 +136,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "mystérieuse",
             pronunciation: "mis-te-ri-øz",
             definition: "Quelque chose d'étrange et intéressant que tu veux en savoir plus."
-          },
-          {
-            word: "émerveillement",
-            pronunciation: "e-mɛr-vɛj-mɑ̃",
-            definition: "Un sentiment de surprise et d'émerveillement devant quelque chose de beau ou spécial."
           }
         ]
       },
@@ -151,13 +143,25 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         pageNumber: 3,
         text: "Dans la forêt, Benny a rencontré de nouveaux amis - des blocs qui pouvaient tout construire et un vieux dinosaure sage qui racontait des histoires incroyables.",
         imageUrl: imageUrls.blocks,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "incroyables",
+            pronunciation: "ɛ̃-kʁwa-jabl",
+            definition: "Si surprenant et merveilleux que c'est difficile à croire."
+          }
+        ]
       },
       {
         pageNumber: 4,
         text: "Ensemble, ils ont construit un pont arc-en-ciel magique qui brillait au soleil. Benny a appris que l'amitié rend chaque aventure spéciale.",
         imageUrl: imageUrls.rainbow,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "aventure",
+            pronunciation: "a-vɑ̃-tyʁ",
+            definition: "Un voyage excitant et amusant où tu découvres de nouvelles choses."
+          }
+        ]
       },
       {
         pageNumber: 5,
@@ -180,9 +184,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🦁"
       },
       {
-        word: "confortable",
-        pronunciation: "kɔ̃-fɔr-tabl",
-        definition: "Chaud, agréable et qui te fait sentir en sécurité et heureux.",
+        word: "incroyables",
+        pronunciation: "ɛ̃-kʁwa-jabl",
+        definition: "Si surprenant et merveilleux que c'est difficile à croire.",
         icon: "🏠"
       },
       {
@@ -192,9 +196,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🔍"
       },
       {
-        word: "émerveillement",
-        pronunciation: "e-mɛr-vɛj-mɑ̃",
-        definition: "Un sentiment de surprise et d'émerveillement devant quelque chose de beau ou spécial.",
+        word: "aventure",
+        pronunciation: "a-vɑ̃-tyʁ",
+        definition: "Un voyage excitant et amusant où tu découvres de nouvelles choses.",
         icon: "✨"
       }
     ]
@@ -210,11 +214,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "mutig",
             pronunciation: "mu-tɪç",
             definition: "Jemand, der keine Angst hat und Mut hat, schwierige Dinge zu tun."
-          },
-          {
-            word: "gemütlich",
-            pronunciation: "gə-my:t-lɪç",
-            definition: "Warm, bequem und gibt dir ein sicheres und glückliches Gefühl."
           }
         ]
       },
@@ -227,11 +226,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "geheimnisvoll",
             pronunciation: "gə-haɪm-nɪs-fɔl",
             definition: "Etwas Seltsames und Interessantes, über das du mehr erfahren möchtest."
-          },
-          {
-            word: "Staunen",
-            pronunciation: "ʃtaʊ-nən",
-            definition: "Ein Gefühl der Überraschung und Bewunderung für etwas Schönes oder Besonderes."
           }
         ]
       },
@@ -239,13 +233,25 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         pageNumber: 3,
         text: "Im Wald traf Benny neue Freunde - Bausteine, die alles bauen konnten, und einen weisen alten Dinosaurier, der erstaunliche Geschichten erzählte.",
         imageUrl: imageUrls.blocks,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "erstaunliche",
+            pronunciation: "ɛɐ-ʃtaʊn-lɪ-çə",
+            definition: "So überraschend und wunderbar, dass es schwer zu glauben ist."
+          }
+        ]
       },
       {
         pageNumber: 4,
         text: "Zusammen bauten sie eine magische Regenbogenbrücke, die im Sonnenlicht funkelte. Benny lernte, dass Freundschaft jedes Abenteuer besonders macht.",
         imageUrl: imageUrls.rainbow,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "Freundschaft",
+            pronunciation: "fʁɔʏnt-ʃaft",
+            definition: "Die besondere Verbindung und Liebe, die du mit deinen Freunden teilst."
+          }
+        ]
       },
       {
         pageNumber: 5,
@@ -268,9 +274,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🦁"
       },
       {
-        word: "gemütlich",
-        pronunciation: "gə-my:t-lɪç",
-        definition: "Warm, bequem und gibt dir ein sicheres und glückliches Gefühl.",
+        word: "erstaunliche",
+        pronunciation: "ɛɐ-ʃtaʊn-lɪ-çə",
+        definition: "So überraschend und wunderbar, dass es schwer zu glauben ist.",
         icon: "🏠"
       },
       {
@@ -280,9 +286,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🔍"
       },
       {
-        word: "Staunen",
-        pronunciation: "ʃtaʊ-nən",
-        definition: "Ein Gefühl der Überraschung und Bewunderung für etwas Schönes oder Besonderes.",
+        word: "Freundschaft",
+        pronunciation: "fʁɔʏnt-ʃaft",
+        definition: "Die besondere Verbindung und Liebe, die du mit deinen Freunden teilst.",
         icon: "✨"
       }
     ]
@@ -298,11 +304,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "勇敢な (ゆうかんな)",
             pronunciation: "yū-kan-na",
             definition: "恐れることなく、困難なことをする勇気を持っている人。"
-          },
-          {
-            word: "居心地の良い (いごこちのよい)",
-            pronunciation: "i-go-ko-chi-no-yo-i",
-            definition: "暖かく、快適で、安全で幸せな気分にさせてくれる。"
           }
         ]
       },
@@ -315,11 +316,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "不思議な (ふしぎな)",
             pronunciation: "fu-shi-gi-na",
             definition: "奇妙で興味深く、もっと知りたいと思うこと。"
-          },
-          {
-            word: "驚き (おどろき)",
-            pronunciation: "o-do-ro-ki",
-            definition: "美しいものや特別なものに対する驚きと感動の気持ち。"
           }
         ]
       },
@@ -327,13 +323,25 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         pageNumber: 3,
         text: "森の中で、ベニーは新しい友達に出会いました - 何でも作れるブロックと、素晴らしい物語を語る賢い古い恐竜です。",
         imageUrl: imageUrls.blocks,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "素晴らしい (すばらしい)",
+            pronunciation: "su-ba-ra-shi-i",
+            definition: "とても驚くほど素敵で、信じられないほどのこと。"
+          }
+        ]
       },
       {
         pageNumber: 4,
         text: "一緒に、彼らは太陽の光できらめく魔法の虹の橋を作りました。ベニーは友情がすべての冒険を特別なものにすることを学びました。",
         imageUrl: imageUrls.rainbow,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "友情 (ゆうじょう)",
+            pronunciation: "yū-jō",
+            definition: "友達と分かち合う特別なつながりと愛情。"
+          }
+        ]
       },
       {
         pageNumber: 5,
@@ -356,9 +364,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🦁"
       },
       {
-        word: "居心地の良い (いごこちのよい)",
-        pronunciation: "i-go-ko-chi-no-yo-i",
-        definition: "暖かく、快適で、安全で幸せな気分にさせてくれる。",
+        word: "素晴らしい (すばらしい)",
+        pronunciation: "su-ba-ra-shi-i",
+        definition: "とても驚くほど素敵で、信じられないほどのこと。",
         icon: "🏠"
       },
       {
@@ -368,9 +376,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🔍"
       },
       {
-        word: "驚き (おどろき)",
-        pronunciation: "o-do-ro-ki",
-        definition: "美しいものや特別なものに対する驚きと感動の気持ち。",
+        word: "友情 (ゆうじょう)",
+        pronunciation: "yū-jō",
+        definition: "友達と分かち合う特別なつながりと愛情。",
         icon: "✨"
       }
     ]
@@ -386,11 +394,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "용감한",
             pronunciation: "yong-gam-han",
             definition: "두려워하지 않고 어려운 일을 할 용기가 있는 사람."
-          },
-          {
-            word: "아늑한",
-            pronunciation: "a-neuk-han",
-            definition: "따뜻하고 편안하며 안전하고 행복한 느낌을 주는 것."
           }
         ]
       },
@@ -403,11 +406,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "신비로운",
             pronunciation: "sin-bi-ro-un",
             definition: "이상하고 흥미로워서 더 알고 싶어지는 것."
-          },
-          {
-            word: "경이로움",
-            pronunciation: "gyeong-i-ro-um",
-            definition: "아름답거나 특별한 것에 대한 놀라움과 감탄의 느낌."
           }
         ]
       },
@@ -415,13 +413,25 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         pageNumber: 3,
         text: "숲에서 베니는 새로운 친구들을 만났습니다 - 무엇이든 만들 수 있는 블록들과 놀라운 이야기를 들려주는 현명한 늙은 공룡이었습니다.",
         imageUrl: imageUrls.blocks,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "현명한",
+            pronunciation: "hyeon-myeong-han",
+            definition: "많이 알고 좋은 판단을 하는 사람."
+          }
+        ]
       },
       {
         pageNumber: 4,
         text: "함께, 그들은 햇빛에 반짝이는 마법의 무지개 다리를 만들었습니다. 베니는 우정이 모든 모험을 특별하게 만든다는 것을 배웠습니다.",
         imageUrl: imageUrls.rainbow,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "우정",
+            pronunciation: "u-jeong",
+            definition: "친구들과 나누는 특별한 유대감과 사랑."
+          }
+        ]
       },
       {
         pageNumber: 5,
@@ -444,9 +454,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🦁"
       },
       {
-        word: "아늑한",
-        pronunciation: "a-neuk-han",
-        definition: "따뜻하고 편안하며 안전하고 행복한 느낌을 주는 것.",
+        word: "현명한",
+        pronunciation: "hyeon-myeong-han",
+        definition: "많이 알고 좋은 판단을 하는 사람.",
         icon: "🏠"
       },
       {
@@ -456,9 +466,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🔍"
       },
       {
-        word: "경이로움",
-        pronunciation: "gyeong-i-ro-um",
-        definition: "아름답거나 특별한 것에 대한 놀라움과 감탄의 느낌.",
+        word: "우정",
+        pronunciation: "u-jeong",
+        definition: "친구들과 나누는 특별한 유대감과 사랑.",
         icon: "✨"
       }
     ]
@@ -474,11 +484,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "बहादुर",
             pronunciation: "ba-hā-dur",
             definition: "कोई जो डरता नहीं है और मुश्किल काम करने की हिम्मत रखता है।"
-          },
-          {
-            word: "आरामदायक",
-            pronunciation: "ā-rām-dā-yak",
-            definition: "गर्म, आरामदायक और आपको सुरक्षित और खुश महसूस कराने वाला।"
           }
         ]
       },
@@ -491,11 +496,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "रहस्यमय",
             pronunciation: "ra-has-ya-may",
             definition: "कुछ अजीब और दिलचस्प जिसके बारे में आप और जानना चाहते हैं।"
-          },
-          {
-            word: "आश्चर्य",
-            pronunciation: "āsh-char-ya",
-            definition: "किसी सुंदर या खास चीज़ के बारे में आश्चर्य और विस्मय की भावना।"
           }
         ]
       },
@@ -503,13 +503,25 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         pageNumber: 3,
         text: "जंगल में, बेनी को नए दोस्त मिले - ब्लॉक जो कुछ भी बना सकते थे और एक बुद्धिमान पुराना डायनासोर जो अद्भुत कहानियाँ सुनाता था।",
         imageUrl: imageUrls.blocks,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "बुद्धिमान",
+            pronunciation: "bud-dhi-mān",
+            definition: "जो बहुत कुछ जानता है और अच्छे फैसले लेता है।"
+          }
+        ]
       },
       {
         pageNumber: 4,
         text: "साथ में, उन्होंने एक जादुई इंद्रधनुष पुल बनाया जो सूरज की रोशनी में चमकता था। बेनी ने सीखा कि दोस्ती हर रोमांच को खास बनाती है।",
         imageUrl: imageUrls.rainbow,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "जादुई",
+            pronunciation: "jā-du-ī",
+            definition: "कुछ ऐसा जो जादू की तरह अद्भुत और अविश्वसनीय हो।"
+          }
+        ]
       },
       {
         pageNumber: 5,
@@ -532,9 +544,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🦁"
       },
       {
-        word: "आरामदायक",
-        pronunciation: "ā-rām-dā-yak",
-        definition: "गर्म, आरामदायक और आपको सुरक्षित और खुश महसूस कराने वाला।",
+        word: "बुद्धिमान",
+        pronunciation: "bud-dhi-mān",
+        definition: "जो बहुत कुछ जानता है और अच्छे फैसले लेता है।",
         icon: "🏠"
       },
       {
@@ -544,9 +556,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🔍"
       },
       {
-        word: "आश्चर्य",
-        pronunciation: "āsh-char-ya",
-        definition: "किसी सुंदर या खास चीज़ के बारे में आश्चर्य और विस्मय की भावना।",
+        word: "जादुई",
+        pronunciation: "jā-du-ī",
+        definition: "कुछ ऐसा जो जादू की तरह अद्भुत और अविश्वसनीय हो।",
         icon: "✨"
       }
     ]
@@ -562,11 +574,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "勇敢 (yǒng gǎn)",
             pronunciation: "yǒng gǎn",
             definition: "不害怕并且有勇气做困难事情的人。"
-          },
-          {
-            word: "舒适 (shū shì)",
-            pronunciation: "shū shì",
-            definition: "温暖、舒服并让你感到安全和快乐。"
           }
         ]
       },
@@ -579,11 +586,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "神秘 (shén mì)",
             pronunciation: "shén mì",
             definition: "奇怪而有趣,让你想了解更多的东西。"
-          },
-          {
-            word: "惊奇 (jīng qí)",
-            pronunciation: "jīng qí",
-            definition: "对美丽或特别的事物感到惊讶和赞叹的感觉。"
           }
         ]
       },
@@ -591,13 +593,25 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         pageNumber: 3,
         text: "在森林里,本尼遇到了新朋友——可以建造任何东西的积木和一只讲述精彩故事的聪明老恐龙。",
         imageUrl: imageUrls.blocks,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "聪明 (cōng míng)",
+            pronunciation: "cōng míng",
+            definition: "知道很多事情并且能做出好决定的人。"
+          }
+        ]
       },
       {
         pageNumber: 4,
         text: "他们一起建造了一座在阳光下闪闪发光的魔法彩虹桥。本尼学到了友谊让每一次冒险都变得特别。",
         imageUrl: imageUrls.rainbow,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "友谊 (yǒu yì)",
+            pronunciation: "yǒu yì",
+            definition: "与朋友分享的特别的联系和爱。"
+          }
+        ]
       },
       {
         pageNumber: 5,
@@ -620,9 +634,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🦁"
       },
       {
-        word: "舒适 (shū shì)",
-        pronunciation: "shū shì",
-        definition: "温暖、舒服并让你感到安全和快乐。",
+        word: "聪明 (cōng míng)",
+        pronunciation: "cōng míng",
+        definition: "知道很多事情并且能做出好决定的人。",
         icon: "🏠"
       },
       {
@@ -632,9 +646,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🔍"
       },
       {
-        word: "惊奇 (jīng qí)",
-        pronunciation: "jīng qí",
-        definition: "对美丽或特别的事物感到惊讶和赞叹的感觉。",
+        word: "友谊 (yǒu yì)",
+        pronunciation: "yǒu yì",
+        definition: "与朋友分享的特别的联系和爱。",
         icon: "✨"
       }
     ]
@@ -650,11 +664,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "勇敢 (yǒng gǎn)",
             pronunciation: "yǒng gǎn",
             definition: "不害怕并且有勇气做困难事情的人。"
-          },
-          {
-            word: "舒适 (shū shì)",
-            pronunciation: "shū shì",
-            definition: "温暖、舒服并让你感到安全和快乐。"
           }
         ]
       },
@@ -667,11 +676,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "神秘 (shén mì)",
             pronunciation: "shén mì",
             definition: "奇怪而有趣,让你想了解更多的东西。"
-          },
-          {
-            word: "惊奇 (jīng qí)",
-            pronunciation: "jīng qí",
-            definition: "对美丽或特别的事物感到惊讶和赞叹的感觉。"
           }
         ]
       },
@@ -679,13 +683,25 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         pageNumber: 3,
         text: "在森林里,本尼遇到了新朋友——可以建造任何东西的积木和一只讲述精彩故事的聪明老恐龙。",
         imageUrl: imageUrls.blocks,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "聪明 (cōng míng)",
+            pronunciation: "cōng míng",
+            definition: "知道很多事情并且能做出好决定的人。"
+          }
+        ]
       },
       {
         pageNumber: 4,
         text: "他们一起建造了一座在阳光下闪闪发光的魔法彩虹桥。本尼学到了友谊让每一次冒险都变得特别。",
         imageUrl: imageUrls.rainbow,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "友谊 (yǒu yì)",
+            pronunciation: "yǒu yì",
+            definition: "与朋友分享的特别的联系和爱。"
+          }
+        ]
       },
       {
         pageNumber: 5,
@@ -708,9 +724,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🦁"
       },
       {
-        word: "舒适 (shū shì)",
-        pronunciation: "shū shì",
-        definition: "温暖、舒服并让你感到安全和快乐。",
+        word: "聪明 (cōng míng)",
+        pronunciation: "cōng míng",
+        definition: "知道很多事情并且能做出好决定的人。",
         icon: "🏠"
       },
       {
@@ -720,9 +736,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🔍"
       },
       {
-        word: "惊奇 (jīng qí)",
-        pronunciation: "jīng qí",
-        definition: "对美丽或特别的事物感到惊讶和赞叹的感觉。",
+        word: "友谊 (yǒu yì)",
+        pronunciation: "yǒu yì",
+        definition: "与朋友分享的特别的联系和爱。",
         icon: "✨"
       }
     ]
@@ -738,11 +754,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "勇敢 (yǒng gǎn)",
             pronunciation: "yǒng gǎn",
             definition: "不害怕並且有勇氣做困難事情的人。"
-          },
-          {
-            word: "舒適 (shū shì)",
-            pronunciation: "shū shì",
-            definition: "溫暖、舒服並讓你感到安全和快樂。"
           }
         ]
       },
@@ -755,11 +766,6 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
             word: "神秘 (shén mì)",
             pronunciation: "shén mì",
             definition: "奇怪而有趣,讓你想了解更多的東西。"
-          },
-          {
-            word: "驚奇 (jīng qí)",
-            pronunciation: "jīng qí",
-            definition: "對美麗或特別的事物感到驚訝和讚嘆的感覺。"
           }
         ]
       },
@@ -767,13 +773,25 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         pageNumber: 3,
         text: "在森林裡,本尼遇到了新朋友——可以建造任何東西的積木和一隻講述精彩故事的聰明老恐龍。",
         imageUrl: imageUrls.blocks,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "聰明 (cōng míng)",
+            pronunciation: "cōng míng",
+            definition: "知道很多事情並且能做出好決定的人。"
+          }
+        ]
       },
       {
         pageNumber: 4,
         text: "他們一起建造了一座在陽光下閃閃發光的魔法彩虹橋。本尼學到了友誼讓每一次冒險都變得特別。",
         imageUrl: imageUrls.rainbow,
-        vocabWords: []
+        vocabWords: [
+          {
+            word: "友誼 (yǒu yì)",
+            pronunciation: "yǒu yì",
+            definition: "與朋友分享的特別的聯繫和愛。"
+          }
+        ]
       },
       {
         pageNumber: 5,
@@ -796,9 +814,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🦁"
       },
       {
-        word: "舒適 (shū shì)",
-        pronunciation: "shū shì",
-        definition: "溫暖、舒服並讓你感到安全和快樂。",
+        word: "聰明 (cōng míng)",
+        pronunciation: "cōng míng",
+        definition: "知道很多事情並且能做出好決定的人。",
         icon: "🏠"
       },
       {
@@ -808,9 +826,9 @@ export const storyTranslations: Record<string, { pages: StoryPage[], vocabulary:
         icon: "🔍"
       },
       {
-        word: "驚奇 (jīng qí)",
-        pronunciation: "jīng qí",
-        definition: "對美麗或特別的事物感到驚訝和讚嘆的感覺。",
+        word: "友誼 (yǒu yì)",
+        pronunciation: "yǒu yì",
+        definition: "與朋友分享的特別的聯繫和愛。",
         icon: "✨"
       }
     ]
