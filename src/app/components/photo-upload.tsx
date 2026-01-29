@@ -1,8 +1,9 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { motion } from "motion/react";
 import { StepIndicator } from "@/app/components/step-indicator";
-import { Camera, AlertCircle, X, Image, ArrowLeft } from "lucide-react";
+import { Camera, AlertCircle, X, Image, ArrowLeft, Loader2 } from "lucide-react";
 import { colors, withOpacity, opacity } from "@/utils/colors";
+import { FaceDetector, FilesetResolver } from "@mediapipe/tasks-vision";
 
 interface PhotoUploadProps {
   onGenerateStory: (photoUrl: string) => void;
@@ -13,18 +14,72 @@ export function PhotoUpload({ onGenerateStory, onBack }: PhotoUploadProps) {
   const [photo, setPhoto] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
+  const [isDetecting, setIsDetecting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const faceDetectorRef = useRef<FaceDetector | null>(null);
 
-  const handleFileSelect = (file: File) => {
+  // Initialize MediaPipe Face Detector
+  useEffect(() => {
+    const initFaceDetector = async () => {
+      try {
+        const vision = await FilesetResolver.forVisionTasks(
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+        );
+        faceDetectorRef.current = await FaceDetector.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite",
+            delegate: "GPU"
+          },
+          runningMode: "IMAGE",
+          minDetectionConfidence: 0.5
+        });
+      } catch (error) {
+        console.error("Failed to initialize face detector:", error);
+      }
+    };
+    initFaceDetector();
+
+    return () => {
+      faceDetectorRef.current?.close();
+    };
+  }, []);
+
+  // Detect faces in the image
+  const detectFaces = async (imageDataUrl: string): Promise<boolean> => {
+    if (!faceDetectorRef.current) {
+      console.warn("Face detector not initialized");
+      return false;
+    }
+
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      img.onload = () => {
+        try {
+          const result = faceDetectorRef.current!.detect(img);
+          resolve(result.detections.length > 0);
+        } catch (error) {
+          console.error("Face detection error:", error);
+          resolve(false);
+        }
+      };
+      img.onerror = () => resolve(false);
+      img.src = imageDataUrl;
+    });
+  };
+
+  const handleFileSelect = async (file: File) => {
     if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         const result = reader.result as string;
         setPhoto(result);
-        // Simulate face detection (random for demo)
-        const hasFace = Math.random() < 0.3;
+        setIsDetecting(true);
+
+        // Use MediaPipe face detection
+        const hasFace = await detectFaces(result);
         setShowWarning(hasFace);
+        setIsDetecting(false);
       };
       reader.readAsDataURL(file);
     }
@@ -113,9 +168,76 @@ export function PhotoUpload({ onGenerateStory, onBack }: PhotoUploadProps) {
         {/* Step Indicator */}
         <StepIndicator currentStep={3} currentSubStep={1} />
 
+        {/* Warning - Above upload zone */}
+        {showWarning && (
+          <motion.div
+            className="p-4 flex items-center gap-3 mx-auto"
+            style={{
+              width: 'min(600px, calc(100vw - 2rem))',
+              marginTop: 'clamp(1rem, 2vw, 2rem)',
+              marginBottom: '-0.5rem',
+              backgroundColor: '#FFF8E7',
+              borderRadius: '24px',
+              boxShadow: `
+                inset 0 0 0 6px #C41E3A,
+                inset 0 0 0 10px #FFF8E7,
+                0 0 0 4px #C41E3A,
+                0 4px 0 #C41E3A,
+                0 6px 15px rgba(0,0,0,0.3)
+              `
+            }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div
+              className="rounded-full flex items-center justify-center"
+              style={{
+                width: '40px',
+                height: '40px',
+                backgroundColor: '#C41E3A',
+                flexShrink: 0
+              }}
+            >
+              <AlertCircle size={20} style={{ color: '#FFFFFF' }} />
+            </div>
+            <div className="flex-1">
+              <p className="text-base" style={{ fontFamily: 'Fredoka, sans-serif', color: colors.textPrimary, fontWeight: 700 }}>
+                Oops! We detected a face.
+              </p>
+              <p className="text-sm" style={{ fontFamily: 'Fredoka, sans-serif', color: colors.textPrimary, fontWeight: 600, opacity: 0.7 }}>
+                Please upload a photo with just the toy.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setPhoto(null);
+                setShowWarning(false);
+              }}
+              className="px-6 py-3 rounded-2xl transition-all"
+              style={{
+                background: 'linear-gradient(180deg, #FF5757 0%, #C41E3A 50%, #A01229 100%)',
+                color: '#FFFFFF',
+                fontFamily: 'Fredoka, sans-serif',
+                fontSize: '14px',
+                fontWeight: 700,
+                boxShadow: `
+                  0 0 0 3px #7A0D1F,
+                  0 4px 0 #7A0D1F,
+                  0 6px 12px rgba(0,0,0,0.3)
+                `,
+                border: 'none',
+                cursor: 'pointer',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
+              }}
+            >
+              Try Again
+            </button>
+          </motion.div>
+        )}
+
         {/* Upload Zone */}
         <motion.div
-          className="mb-6 sm:mb-8 cursor-pointer transition-all duration-200 flex items-center justify-center relative overflow-hidden mt-8 sm:mt-12 mx-auto"
+          className="mb-6 sm:mb-8 cursor-pointer transition-all duration-200 flex items-center justify-center relative overflow-hidden mx-auto"
           style={{
             width: 'min(600px, calc(100vw - 2rem))',
             height: 'clamp(250px, 35vh, 450px)',
@@ -178,78 +300,12 @@ export function PhotoUpload({ onGenerateStory, onBack }: PhotoUploadProps) {
             className="hidden"
           />
 
-          {/* Warning - Inside upload zone at top */}
-          {showWarning && (
-            <motion.div
-              className="absolute top-0 left-0 right-0 p-4 flex items-center gap-3 z-10"
-              style={{ 
-                backgroundColor: '#FFF8E7',
-                borderRadius: '32px 32px 0 0',
-                boxShadow: `
-                  inset 0 0 0 6px #C41E3A,
-                  inset 0 0 0 10px #FFF8E7,
-                  0 0 0 4px #C41E3A,
-                  0 4px 0 #C41E3A,
-                  0 6px 15px rgba(0,0,0,0.3)
-                `
-              }}
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div
-                className="rounded-full flex items-center justify-center"
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  backgroundColor: '#C41E3A',
-                  flexShrink: 0
-                }}
-              >
-                <AlertCircle size={20} style={{ color: '#FFFFFF' }} />
-              </div>
-              <div className="flex-1">
-                <p className="text-base" style={{ fontFamily: 'Fredoka, sans-serif', color: colors.textPrimary, fontWeight: 700 }}>
-                  Oops! We detected a face.
-                </p>
-                <p className="text-sm" style={{ fontFamily: 'Fredoka, sans-serif', color: colors.textPrimary, fontWeight: 600, opacity: 0.7 }}>
-                  Please upload a photo with just the toy.
-                </p>
-              </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPhoto(null);
-                  setShowWarning(false);
-                }}
-                className="px-6 py-3 rounded-2xl transition-all"
-                style={{ 
-                  background: 'linear-gradient(180deg, #FF5757 0%, #C41E3A 50%, #A01229 100%)',
-                  color: '#FFFFFF',
-                  fontFamily: 'Fredoka, sans-serif',
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  boxShadow: `
-                    0 0 0 3px #7A0D1F,
-                    0 4px 0 #7A0D1F,
-                    0 6px 12px rgba(0,0,0,0.3)
-                  `,
-                  border: 'none',
-                  cursor: 'pointer',
-                  textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
-                }}
-              >
-                Try Again
-              </button>
-            </motion.div>
-          )}
-
           {!photo ? (
             <div className="flex flex-col items-center gap-4 p-8 text-center">
-              <div 
+              <div
                 className="rounded-2xl flex items-center justify-center"
-                style={{ 
-                  width: '100px', 
+                style={{
+                  width: '100px',
                   height: '100px',
                   backgroundColor: '#FFF8E7',
                   boxShadow: `
@@ -263,9 +319,9 @@ export function PhotoUpload({ onGenerateStory, onBack }: PhotoUploadProps) {
               >
                 <Camera size={48} style={{ color: colors.sunnyYellow, filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.2))' }} />
               </div>
-              <p 
+              <p
                 className="text-2xl"
-                style={{ 
+                style={{
                   fontFamily: 'Fredoka, sans-serif',
                   color: colors.textPrimary,
                   fontWeight: 700
@@ -275,6 +331,25 @@ export function PhotoUpload({ onGenerateStory, onBack }: PhotoUploadProps) {
               </p>
               <p className="text-lg" style={{ fontFamily: 'Fredoka, sans-serif', color: colors.textPrimary, opacity: 0.7, fontWeight: 600 }}>
                 Or use the gallery button below
+              </p>
+            </div>
+          ) : isDetecting ? (
+            <div className="flex flex-col items-center gap-4 p-8 text-center">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              >
+                <Loader2 size={48} style={{ color: colors.royalBlue }} />
+              </motion.div>
+              <p
+                className="text-xl"
+                style={{
+                  fontFamily: 'Fredoka, sans-serif',
+                  color: colors.textPrimary,
+                  fontWeight: 700
+                }}
+              >
+                Checking photo...
               </p>
             </div>
           ) : (
@@ -368,30 +443,30 @@ export function PhotoUpload({ onGenerateStory, onBack }: PhotoUploadProps) {
         <div className="flex justify-center pb-8">
         <motion.button
           onClick={handleGenerate}
-          disabled={!photo || showWarning}
+          disabled={!photo || showWarning || isDetecting}
           className="rounded-full py-5 px-16 transition-all duration-200"
           style={{
-            background: (!photo || showWarning) 
+            background: (!photo || showWarning || isDetecting)
               ? withOpacity(colors.mediumGray, 0.3)
               : `linear-gradient(180deg, ${colors.primaryLight} 0%, ${colors.primary} 100%)`,
-            color: (!photo || showWarning) ? withOpacity(colors.textPrimary, opacity.subtle) : colors.white,
+            color: (!photo || showWarning || isDetecting) ? withOpacity(colors.textPrimary, opacity.subtle) : colors.white,
             fontSize: '20px',
             fontFamily: 'Fredoka, sans-serif',
             fontWeight: 700,
-            cursor: (!photo || showWarning) ? 'not-allowed' : 'pointer',
-            boxShadow: (!photo || showWarning) 
-              ? 'none' 
+            cursor: (!photo || showWarning || isDetecting) ? 'not-allowed' : 'pointer',
+            boxShadow: (!photo || showWarning || isDetecting)
+              ? 'none'
               : `0 0 0 5px ${colors.primaryDark}, 0 6px 0 ${colors.primaryDark}, 0 8px 20px rgba(0,0,0,0.3)`,
             border: 'none',
-            textShadow: (!photo || showWarning) 
-              ? 'none' 
+            textShadow: (!photo || showWarning || isDetecting)
+              ? 'none'
               : `2px 2px 0 ${colors.primaryDark}, -1px -1px 0 ${colors.primaryDark}, 1px -1px 0 ${colors.primaryDark}, -1px 1px 0 ${colors.primaryDark}`
           }}
-          whileHover={(!photo || showWarning) ? {} : { 
+          whileHover={(!photo || showWarning || isDetecting) ? {} : {
             scale: 1.05,
             boxShadow: `0 0 0 5px ${colors.primaryDark}, 0 8px 0 ${colors.primaryDark}, 0 10px 25px rgba(0,0,0,0.35)`
           }}
-          whileTap={(!photo || showWarning) ? {} : { 
+          whileTap={(!photo || showWarning || isDetecting) ? {} : {
             scale: 0.95,
             boxShadow: `0 0 0 5px ${colors.primaryDark}, 0 2px 0 ${colors.primaryDark}, 0 4px 10px rgba(0,0,0,0.3)`,
             translateY: 4

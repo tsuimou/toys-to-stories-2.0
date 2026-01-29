@@ -73,14 +73,18 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
   }, [currentPage]);
 
   const handleNextPage = () => {
-    if (flipBookRef.current) {
-      flipBookRef.current.pageFlip().flipNext();
+    const pageFlip = flipBookRef.current?.pageFlip();
+    if (pageFlip) {
+      const current = pageFlip.getCurrentPageIndex();
+      pageFlip.turnToPage(current + 2);
     }
   };
 
   const handlePrevPage = () => {
-    if (flipBookRef.current) {
-      flipBookRef.current.pageFlip().flipPrev();
+    const pageFlip = flipBookRef.current?.pageFlip();
+    if (pageFlip) {
+      const current = pageFlip.getCurrentPageIndex();
+      pageFlip.turnToPage(Math.max(0, current - 2));
     }
   };
 
@@ -376,23 +380,28 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
 
       {/* Flipbook Container */}
       <div
-        className="relative z-10"
+        className="relative z-10 flex items-center justify-center book-scale-container"
         style={{
-          marginTop: '60px',
-          marginBottom: '60px',
+          marginTop: '70px',
+          marginBottom: '80px',
         }}
       >
-        {/* Book wrapper with spine and cover styling */}
+        {/* Book wrapper with 3D red hardcover styling */}
         <div
+          className="book-cover"
           style={{
             padding: '20px',
-            background: `linear-gradient(90deg, #8B4513 0%, #A0522D 5%, #DEB887 6%, #FFF8E7 10%, #FFF8E7 90%, #DEB887 94%, #A0522D 95%, #8B4513 100%)`,
-            borderRadius: '8px 16px 16px 8px',
+            background: `linear-gradient(135deg, #C42B2B 0%, #DC3545 50%, #A82222 100%)`,
+            borderRadius: '8px',
             boxShadow: `
-              0 0 0 4px #5D3A1A,
-              0 10px 0 #5D3A1A,
-              0 12px 40px rgba(0,0,0,0.5),
-              inset 0 0 30px rgba(0,0,0,0.1)
+              0 0 0 4px #4A0D0D,
+              4px 4px 0 0 #3D0A0A,
+              8px 8px 0 0 #2E0808,
+              12px 12px 0 0 #1F0505,
+              12px 16px 20px rgba(0,0,0,0.5),
+              0 20px 40px rgba(0,0,0,0.3),
+              inset 0 2px 4px rgba(255,255,255,0.2),
+              inset 0 -2px 4px rgba(0,0,0,0.2)
             `,
           }}
         >
@@ -401,11 +410,11 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
             ref={flipBookRef}
             width={400}
             height={500}
-            size="stretch"
-            minWidth={300}
-            maxWidth={500}
-            minHeight={400}
-            maxHeight={600}
+            size="fixed"
+            minWidth={400}
+            maxWidth={400}
+            minHeight={500}
+            maxHeight={500}
             maxShadowOpacity={0.5}
             showCover={false}
             mobileScrollSupport={true}
@@ -417,7 +426,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
             flippingTime={800}
             usePortrait={false}
             startZIndex={0}
-            autoSize={true}
+            autoSize={false}
             clickEventForward={true}
             useMouseEvents={true}
             swipeDistance={30}
@@ -589,7 +598,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                 translateY: 2
               }}
             >
-              <X size={18} style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }} />
+              <X size={18} style={{ color: '#B02D38', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }} />
             </motion.button>
 
             <h3
@@ -657,7 +666,7 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
                 translateY: 2
               }}
             >
-              <Volume2 size={24} style={{ color: colors.white, filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.3))' }} />
+              <Volume2 size={24} style={{ color: '#A89200', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.3))' }} />
             </motion.button>
           </motion.div>
         )}
@@ -824,13 +833,42 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
       {/* Custom styles for flipbook */}
       <style>{`
         .storybook-flipbook {
-          box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+          box-shadow:
+            inset 2px 0 8px rgba(0,0,0,0.1),
+            inset -2px 0 8px rgba(0,0,0,0.1);
+          border-radius: 4px;
         }
         .storybook-flipbook .page {
           background-color: #FFF8E7;
+          box-shadow: inset 0 0 30px rgba(0,0,0,0.03);
         }
         .storybook-flipbook .page-wrapper {
           perspective: 2000px;
+        }
+        /* Scale the book container responsively */
+        .book-scale-container {
+          transform: scale(0.6);
+          transform-origin: center center;
+        }
+        @media (min-width: 640px) {
+          .book-scale-container {
+            transform: scale(0.75);
+          }
+        }
+        @media (min-width: 768px) {
+          .book-scale-container {
+            transform: scale(0.9);
+          }
+        }
+        @media (min-width: 1024px) {
+          .book-scale-container {
+            transform: scale(1);
+          }
+        }
+        @media (min-width: 1280px) {
+          .book-scale-container {
+            transform: scale(1.1);
+          }
         }
       `}</style>
     </div>

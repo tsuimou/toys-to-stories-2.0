@@ -12,6 +12,7 @@
     "@emotion/styled": "11.14.1",
     "@google/genai": "^1.38.0",
     "@google/generative-ai": "^0.24.1",
+    "@mediapipe/tasks-vision": "^0.10.32",
     "@mui/icons-material": "7.3.5",
     "@mui/material": "7.3.5",
     "@popperjs/core": "2.11.8",
