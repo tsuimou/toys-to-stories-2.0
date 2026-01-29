@@ -297,6 +297,60 @@ export function isApiConfigured(): boolean {
 }
 
 // ============================================
+// C2PA CONTENT CREDENTIALS
+// ============================================
+
+/**
+ * Sign an image with C2PA Content Credentials
+ * This adds provenance metadata indicating the image is AI-generated
+ */
+export async function signImageWithC2PA(
+  imageDataUrl: string,
+  pageNumber?: number
+): Promise<string> {
+  try {
+    // Extract base64 and mimeType from data URL
+    const matches = imageDataUrl.match(/^data:([^;]+);base64,(.+)$/);
+    if (!matches) {
+      console.warn('[C2PA] Invalid data URL format, skipping signing');
+      return imageDataUrl;
+    }
+
+    const [, mimeType, imageBase64] = matches;
+
+    // Call the signing API
+    const response = await fetch('/api/sign-image', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        imageBase64,
+        mimeType,
+        pageNumber,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('[C2PA] Signing failed:', errorData);
+      return imageDataUrl; // Return unsigned image on failure
+    }
+
+    const data = await response.json();
+    if (data.success && data.signedImageBase64) {
+      console.log(`[C2PA] Image signed successfully (page ${pageNumber || 'unknown'})`);
+      return `data:${data.mimeType};base64,${data.signedImageBase64}`;
+    }
+
+    return imageDataUrl;
+  } catch (error) {
+    console.error('[C2PA] Error signing image:', error);
+    return imageDataUrl; // Return unsigned image on error
+  }
+}
+
+// ============================================
 // IMAGE GENERATION
 // ============================================
 
@@ -325,6 +379,7 @@ export interface ImageGenerationParams {
   toyName: string;
   pageNumber: number;
   totalPages: number;
+  enableC2PA?: boolean; // Enable Content Credentials signing
 }
 
 /**
@@ -393,7 +448,16 @@ The illustration should be magical, warm, and perfect for a children's storybook
           const imageData = part.inlineData.data;
           const mimeType = part.inlineData.mimeType;
           console.log(`[Image Gen] Page ${params.pageNumber} - Success! Got ${mimeType} image`);
-          return `data:${mimeType};base64,${imageData}`;
+
+          let imageUrl = `data:${mimeType};base64,${imageData}`;
+
+          // Sign with C2PA Content Credentials if enabled
+          if (params.enableC2PA) {
+            console.log(`[Image Gen] Page ${params.pageNumber} - Signing with C2PA...`);
+            imageUrl = await signImageWithC2PA(imageUrl, params.pageNumber);
+          }
+
+          return imageUrl;
         }
       }
     }
@@ -416,18 +480,21 @@ export function resetImageModelIndex(): void {
 /**
  * Generate all images for a story
  * Each image will feature the same toy character in different scenes
+ * @param enableC2PA - Enable Content Credentials signing for AI transparency
  */
 export async function generateAllStoryImages(
   pages: GeneratedStoryPage[],
   toyDescription: string,
   toyName: string,
-  onProgress?: (current: number, total: number) => void
+  onProgress?: (current: number, total: number) => void,
+  enableC2PA: boolean = true // Enable C2PA by default
 ): Promise<string[]> {
   const images: string[] = [];
   const totalPages = pages.length;
 
   console.log('Starting image generation for', totalPages, 'pages');
   console.log('Toy character description:', toyDescription);
+  console.log('C2PA Content Credentials:', enableC2PA ? 'ENABLED' : 'DISABLED');
 
   for (let i = 0; i < pages.length; i++) {
     onProgress?.(i + 1, totalPages);
@@ -440,9 +507,10 @@ export async function generateAllStoryImages(
         toyName,
         pageNumber: i + 1,
         totalPages,
+        enableC2PA,
       });
       images.push(imageUrl);
-      console.log(`✓ Image ${i + 1} generated successfully`);
+      console.log(`✓ Image ${i + 1} generated${enableC2PA ? ' and signed with C2PA' : ''}`);
     } catch (error) {
       console.error(`✗ Failed to generate image for page ${i + 1}:`, error);
       // Use empty string - will fall back to default image

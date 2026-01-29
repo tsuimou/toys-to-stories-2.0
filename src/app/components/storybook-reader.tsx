@@ -73,18 +73,22 @@ export function StorybookReader({ pages, onClose, onComplete }: StorybookReaderP
   }, [currentPage]);
 
   const handleNextPage = () => {
+    // If on last page, go to vocabulary review
+    if (currentPage >= pages.length - 1) {
+      onComplete();
+      return;
+    }
+
     const pageFlip = flipBookRef.current?.pageFlip();
     if (pageFlip) {
-      const current = pageFlip.getCurrentPageIndex();
-      pageFlip.turnToPage(current + 2);
+      pageFlip.flipNext();
     }
   };
 
   const handlePrevPage = () => {
     const pageFlip = flipBookRef.current?.pageFlip();
     if (pageFlip) {
-      const current = pageFlip.getCurrentPageIndex();
-      pageFlip.turnToPage(Math.max(0, current - 2));
+      pageFlip.flipPrev();
     }
   };
 

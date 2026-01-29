@@ -8,6 +8,7 @@
     "dev": "vite"
   },
   "dependencies": {
+    "@contentauth/c2pa-node": "^0.5.1",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
     "@google/genai": "^1.38.0",
@@ -68,6 +69,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.1.12",
+    "@vercel/node": "^5.5.28",
     "@vitejs/plugin-react": "4.7.0",
     "tailwindcss": "4.1.12",
     "vite": "6.3.5"
