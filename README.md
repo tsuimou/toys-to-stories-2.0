@@ -13,8 +13,11 @@ Kids upload a photo of their favorite toy, give it a name and personality, and t
 - **Personality Customization** - Sliders for energy level and confidence shape the story's tone
 - **Age-Appropriate Content** - Stories scale vocabulary and complexity based on age (3-5, 6-8, 9-12)
 - **8 Languages** - Spanish, French, German, Japanese, Korean, Hindi, Mandarin (Simplified & Traditional)
-- **Interactive Storybook** - Page-by-page reader with animations
+- **Interactive Storybook** - Page-by-page reader with flip animations
 - **Vocabulary Review** - Learn new words from the story with pronunciations and definitions
+- **ElevenLabs TTS** - High-quality voice pronunciation for vocabulary words (with browser TTS fallback)
+- **PDF Download** - Download the complete storybook as a landscape PDF
+- **C2PA Content Credentials** - AI-generated images include Adobe Content Credentials for transparency
 
 ## Screenshots
 
@@ -29,7 +32,11 @@ Kids upload a photo of their favorite toy, give it a name and personality, and t
 - **Tailwind CSS 4** - Utility-first styling
 - **Radix UI + shadcn/ui** - Accessible component primitives
 - **Motion (Framer)** - Smooth animations
-- **Google Gemini AI** - Story generation and image analysis
+- **Google Gemini AI** - Story generation, image analysis, and illustration generation
+- **ElevenLabs** - High-quality multilingual text-to-speech via Vercel serverless function
+- **C2PA (Content Credentials)** - Adobe Content Authenticity for AI-generated images
+- **jsPDF** - PDF generation for downloadable storybooks
+- **Vercel** - Hosting and serverless functions
 
 ## Getting Started
 
@@ -60,9 +67,14 @@ Create a `.env` file in the root directory:
 
 ```
 VITE_GEMINI_API_KEY=your_gemini_api_key_here
+ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
 ```
 
-Get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey).
+Get your API keys from:
+- **Gemini**: [Google AI Studio](https://makersuite.google.com/app/apikey)
+- **ElevenLabs**: [elevenlabs.io](https://elevenlabs.io) → Profile → API Keys (free tier: 10,000 chars/month)
+
+> **Note:** ElevenLabs is optional. If not configured, the app falls back to browser text-to-speech.
 
 ### Development
 
@@ -94,18 +106,51 @@ Output is in the `/dist` folder, ready for deployment.
 ## Project Structure
 
 ```
-src/
-├── app/
-│   ├── components/     # React components
-│   │   ├── ui/         # shadcn/ui base components
-│   │   └── *.tsx       # Screen components
-│   ├── data/           # Static translations
-│   └── App.tsx         # Main app (screen state machine)
-├── services/
-│   └── gemini.ts       # AI integration
-├── utils/
-│   └── colors.ts       # Design system colors
-└── styles/             # CSS files
+├── api/
+│   └── tts.ts              # Vercel serverless function for ElevenLabs TTS
+├── src/
+│   ├── app/
+│   │   ├── components/     # React components
+│   │   │   ├── ui/         # shadcn/ui base components
+│   │   │   └── *.tsx       # Screen components
+│   │   ├── data/           # Static translations
+│   │   └── App.tsx         # Main app (screen state machine)
+│   ├── services/
+│   │   └── gemini.ts       # Gemini AI integration (story, images, C2PA)
+│   ├── utils/
+│   │   ├── colors.ts       # Design system colors
+│   │   └── pdf-generator.ts # PDF storybook generation
+│   └── styles/             # CSS files
+└── vercel.json             # Vercel serverless config
+```
+
+## AI Transparency (C2PA Content Credentials)
+
+All AI-generated story illustrations include [C2PA Content Credentials](https://c2pa.org/) (Adobe Content Authenticity Initiative). This embeds metadata into images indicating:
+- The image was AI-generated
+- The AI model used (Google Gemini)
+- When it was created
+
+This promotes transparency and helps users understand the origin of AI-generated content.
+
+## Deployment (Vercel)
+
+The app is designed to deploy on Vercel with serverless functions:
+
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Login and deploy
+vercel login
+vercel
+
+# Add environment variables
+vercel env add VITE_GEMINI_API_KEY
+vercel env add ELEVENLABS_API_KEY
+
+# Deploy to production
+vercel --prod
 ```
 
 ## Built With
