@@ -9,7 +9,7 @@ interface WelcomeProps {
 export function Welcome({ onGetStarted }: WelcomeProps) {
   return (
     <div
-      className="min-h-screen relative overflow-hidden"
+      className="h-screen relative overflow-hidden"
       style={{
         fontFamily: 'Nunito, sans-serif',
         background: 'linear-gradient(180deg, #1a1a2e 0%, #2d2d44 50%, #1a1a2e 100%)'
@@ -19,16 +19,16 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 80% 50% at 50% 40%, rgba(255, 180, 100, 0.15) 0%, transparent 60%)',
+          background: 'radial-gradient(ellipse 80% 50% at 50% 35%, rgba(255, 180, 100, 0.15) 0%, transparent 60%)',
         }}
       />
 
       {/* Main content container */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:px-6 sm:py-12 md:px-10 md:py-16">
+      <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 py-4 sm:px-6 sm:py-6 md:px-10 md:py-8">
 
-        {/* Hero Image - Prominent and responsive */}
+        {/* Hero Image - Responsive to viewport */}
         <motion.div
-          className="w-full flex justify-center mb-6 sm:mb-8 md:mb-10"
+          className="w-full flex justify-center mb-3 sm:mb-4 md:mb-6"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
@@ -36,10 +36,10 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
           <div
             className="relative"
             style={{
-              width: 'min(85vw, 480px)',
-              height: 'min(85vw, 480px)',
-              maxWidth: '480px',
-              maxHeight: '480px',
+              width: 'min(50vh, min(85vw, 400px))',
+              height: 'min(50vh, min(85vw, 400px))',
+              maxWidth: '400px',
+              maxHeight: '400px',
             }}
           >
             {/* Glow behind image */}
@@ -85,13 +85,13 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
 
         {/* Title Section */}
         <motion.div
-          className="text-center mb-6 sm:mb-8"
+          className="text-center mb-3 sm:mb-4 md:mb-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
         >
           <h1
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-3 sm:mb-4"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-1 sm:mb-2"
             style={{
               fontFamily: 'Fredoka, sans-serif',
               fontWeight: 700,
@@ -104,7 +104,7 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
           </h1>
 
           <p
-            className="text-lg sm:text-xl md:text-2xl"
+            className="text-base sm:text-lg md:text-xl"
             style={{
               fontFamily: 'Fredoka, sans-serif',
               fontWeight: 500,
@@ -118,7 +118,7 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
 
         {/* Feature Pills - Clean horizontal layout */}
         <motion.div
-          className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8 sm:mb-10 px-2"
+          className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-4 sm:mb-6 px-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.6 }}
@@ -130,7 +130,7 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
           ].map((feature, index) => (
             <motion.div
               key={feature.label}
-              className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full"
               style={{
                 background: 'rgba(255,255,255,0.1)',
                 backdropFilter: 'blur(10px)',
@@ -145,11 +145,12 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
               }}
             >
               <feature.icon
-                size={18}
+                size={16}
+                className="sm:w-[18px] sm:h-[18px]"
                 style={{ color: feature.color }}
               />
               <span
-                className="text-sm sm:text-base font-semibold"
+                className="text-xs sm:text-sm font-semibold"
                 style={{ color: '#FFFFFF' }}
               >
                 {feature.label}
@@ -161,18 +162,18 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
         {/* CTA Button */}
         <motion.button
           onClick={onGetStarted}
-          className="relative px-10 sm:px-14 py-4 sm:py-5 rounded-full cursor-pointer overflow-hidden"
+          className="relative px-8 sm:px-12 py-3 sm:py-4 rounded-full cursor-pointer overflow-hidden"
           style={{
             background: `linear-gradient(180deg, ${colors.primaryLight} 0%, ${colors.primary} 100%)`,
             color: '#FFFFFF',
-            fontSize: 'clamp(18px, 4vw, 22px)',
+            fontSize: 'clamp(16px, 3.5vw, 20px)',
             fontFamily: 'Fredoka, sans-serif',
             fontWeight: 700,
             border: 'none',
             boxShadow: `
-              0 0 0 4px ${colors.primaryDark},
-              0 6px 0 ${colors.primaryDark},
-              0 10px 30px rgba(61, 139, 255, 0.4)
+              0 0 0 3px ${colors.primaryDark},
+              0 4px 0 ${colors.primaryDark},
+              0 8px 25px rgba(61, 139, 255, 0.4)
             `,
             textShadow: '0 2px 4px rgba(0,0,0,0.2)',
           }}
@@ -182,19 +183,19 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
           whileHover={{
             scale: 1.05,
             boxShadow: `
-              0 0 0 4px ${colors.primaryDark},
-              0 8px 0 ${colors.primaryDark},
-              0 15px 40px rgba(61, 139, 255, 0.5)
+              0 0 0 3px ${colors.primaryDark},
+              0 6px 0 ${colors.primaryDark},
+              0 12px 35px rgba(61, 139, 255, 0.5)
             `,
           }}
           whileTap={{
             scale: 0.98,
             boxShadow: `
-              0 0 0 4px ${colors.primaryDark},
+              0 0 0 3px ${colors.primaryDark},
               0 2px 0 ${colors.primaryDark},
-              0 5px 15px rgba(61, 139, 255, 0.4)
+              0 4px 12px rgba(61, 139, 255, 0.4)
             `,
-            translateY: 4,
+            translateY: 2,
           }}
         >
           Get Started
@@ -202,7 +203,7 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
 
         {/* Subtle info text */}
         <motion.p
-          className="mt-6 sm:mt-8 text-center text-sm sm:text-base"
+          className="mt-3 sm:mt-4 text-center text-xs sm:text-sm"
           style={{
             color: 'rgba(255,255,255,0.5)',
             fontWeight: 500,
