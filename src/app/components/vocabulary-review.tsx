@@ -114,74 +114,152 @@ export function VocabularyReview({ vocabularyWords, onDownloadPdf, onStartOver, 
         </div>
 
         {/* Vocabulary Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8 md:mb-12">
-          {vocabularyWords.map((vocab, index) => (
-            <motion.div
-              key={vocab.word}
-              className="bg-white rounded-3xl p-4 sm:p-6 md:p-8"
-              style={{ 
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-              }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ 
-                scale: 1.02,
-                boxShadow: '0 4px 16px rgba(0,0,0,0.1)'
-              }}
-            >
-              <div className="flex items-start gap-4">
-                {/* Icon */}
-                <div 
-                  className="rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ 
-                    width: '60px', 
-                    height: '60px',
-                    fontSize: '32px'
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-7 mb-6 sm:mb-8 md:mb-12">
+          {(() => {
+            // Wood texture colors - light end grain wood
+            const woodLight = '#F5E6D3';
+
+            // Alternating border colors for cards
+            const borderColors = ['#C41E3A', '#1565C0', '#2E7D32', '#F57C00'];
+
+            return vocabularyWords.map((vocab, index) => {
+              const borderColor = borderColors[index % borderColors.length];
+
+              return (
+                <motion.div
+                  key={vocab.word}
+                  className="cursor-pointer"
+                  style={{
+                    background: `
+                      repeating-linear-gradient(
+                        45deg,
+                        transparent 0px,
+                        transparent 8px,
+                        rgba(184, 149, 110, 0.12) 8px,
+                        rgba(184, 149, 110, 0.12) 9px,
+                        transparent 9px,
+                        transparent 16px,
+                        rgba(139, 90, 43, 0.1) 16px,
+                        rgba(139, 90, 43, 0.1) 17px,
+                        transparent 17px,
+                        transparent 24px,
+                        rgba(184, 149, 110, 0.08) 24px,
+                        rgba(184, 149, 110, 0.08) 25px,
+                        transparent 25px,
+                        transparent 32px
+                      ),
+                      ${woodLight}
+                    `,
+                    borderRadius: '12px',
+                    boxShadow: `
+                      inset 0 0 0 6px ${borderColor},
+                      inset 0 0 0 10px ${woodLight},
+                      0 0 0 4px ${borderColor},
+                      0 5px 0 ${borderColor},
+                      0 7px 18px rgba(0,0,0,0.35)
+                    `,
+                    padding: '24px',
+                  }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{
+                    scale: 1.03,
+                    boxShadow: `
+                      inset 0 0 0 6px ${borderColor},
+                      inset 0 0 0 10px ${woodLight},
+                      0 0 0 4px ${borderColor},
+                      0 7px 0 ${borderColor},
+                      0 9px 22px rgba(0,0,0,0.4)
+                    `
+                  }}
+                  whileTap={{
+                    scale: 0.97,
+                    boxShadow: `
+                      inset 0 0 0 6px ${borderColor},
+                      inset 0 0 0 10px ${woodLight},
+                      0 0 0 4px ${borderColor},
+                      0 2px 0 ${borderColor},
+                      0 4px 10px rgba(0,0,0,0.3)
+                    `,
+                    translateY: 3
                   }}
                 >
-                  {vocab.icon}
-                </div>
-
-                {/* Content */}
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 
-                      className="text-3xl"
-                      style={{ 
-                        fontFamily: 'Fredoka, sans-serif',
-                        color: '#2C3E50'
+                  <div className="flex items-start gap-4">
+                    {/* Icon Block */}
+                    <div
+                      className="flex items-center justify-center flex-shrink-0"
+                      style={{
+                        width: '64px',
+                        height: '64px',
+                        backgroundColor: borderColor,
+                        borderRadius: '6px',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                        fontSize: '32px'
                       }}
                     >
-                      {vocab.word}
-                    </h3>
+                      {vocab.icon}
+                    </div>
 
-                    <button
-                      className="rounded-full p-2 transition-all hover:scale-110 flex-shrink-0"
-                      style={{ backgroundColor: '#FF9A5620' }}
-                      onClick={() => alert(`Playing pronunciation for "${vocab.word}"`)}
-                    >
-                      <Volume2 size={20} style={{ color: '#FF9A56' }} />
-                    </button>
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <h3
+                          className="text-2xl sm:text-3xl truncate"
+                          style={{
+                            fontFamily: 'Fredoka, sans-serif',
+                            color: colors.textPrimary,
+                            fontWeight: 700
+                          }}
+                        >
+                          {vocab.word}
+                        </h3>
+
+                        <motion.button
+                          className="rounded-lg p-2 flex-shrink-0"
+                          style={{
+                            backgroundColor: borderColor,
+                            boxShadow: `0 2px 0 ${borderColor}dd, 0 3px 6px rgba(0,0,0,0.2)`
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            alert(`Playing pronunciation for "${vocab.word}"`);
+                          }}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <Volume2 size={18} style={{ color: colors.white }} />
+                        </motion.button>
+                      </div>
+
+                      <p
+                        className="text-base sm:text-lg mb-2 italic"
+                        style={{
+                          color: '#9B7EDE',
+                          fontFamily: 'Fredoka, sans-serif',
+                          fontWeight: 500
+                        }}
+                      >
+                        {vocab.pronunciation}
+                      </p>
+
+                      <p
+                        className="text-base sm:text-lg leading-relaxed"
+                        style={{
+                          color: colors.textPrimary,
+                          fontFamily: 'Fredoka, sans-serif',
+                          fontWeight: 500,
+                          opacity: 0.85
+                        }}
+                      >
+                        {vocab.definition}
+                      </p>
+                    </div>
                   </div>
-
-                  <p 
-                    className="text-lg mb-2 italic"
-                    style={{ color: '#9B7EDE', opacity: 0.8 }}
-                  >
-                    {vocab.pronunciation}
-                  </p>
-
-                  <p 
-                    className="text-lg leading-relaxed"
-                    style={{ color: '#2C3E50', opacity: 0.8 }}
-                  >
-                    {vocab.definition}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+                </motion.div>
+              );
+            });
+          })()}
         </div>
 
         {/* Action Buttons */}
