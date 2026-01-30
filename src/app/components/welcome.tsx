@@ -8,8 +8,8 @@ interface WelcomeProps {
 
 export function Welcome({ onGetStarted }: WelcomeProps) {
   return (
-    <div className="h-screen flex items-center justify-center p-4 sm:p-6 md:p-10 relative overflow-y-auto" style={{ fontFamily: 'Nunito, sans-serif' }}>
-      <div className="w-full max-w-2xl text-center relative z-10">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-10 relative overflow-y-auto" style={{ fontFamily: 'Nunito, sans-serif' }}>
+      <div className="w-full max-w-3xl text-center relative z-10">
         {/* Logo/Icon */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -17,10 +17,46 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
           transition={{ duration: 0.6 }}
           className="text-center"
         >
+          {/* Hero Image */}
+          <motion.div
+            className="mb-4 sm:mb-6 md:mb-8 flex justify-center"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1, duration: 0.6 }}
+          >
+            <div
+              className="relative rounded-2xl sm:rounded-3xl overflow-hidden"
+              style={{
+                width: 'min(90vw, 400px)',
+                height: 'min(90vw, 400px)',
+                maxWidth: '400px',
+                maxHeight: '400px',
+                boxShadow: `
+                  0 0 0 4px ${colors.primaryDark},
+                  0 6px 0 ${colors.primaryDark},
+                  0 10px 30px rgba(0,0,0,0.3)
+                `,
+              }}
+            >
+              <img
+                src="/images/hero-image.png"
+                alt="A child reading stories surrounded by toys"
+                className="w-full h-full object-cover"
+              />
+              {/* Subtle glow overlay */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: 'radial-gradient(circle at 50% 60%, rgba(255,200,100,0.15) 0%, transparent 60%)',
+                }}
+              />
+            </div>
+          </motion.div>
+
           {/* Main Title */}
-          <motion.h1 
-            className="text-4xl sm:text-5xl md:text-7xl mb-4 sm:mb-6" 
-            style={{ 
+          <motion.h1
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-2 sm:mb-4"
+            style={{
               fontFamily: 'Fredoka, sans-serif',
               color: colors.textPrimary,
               fontWeight: 700
@@ -33,8 +69,8 @@ export function Welcome({ onGetStarted }: WelcomeProps) {
           </motion.h1>
 
           {/* Subtitle */}
-          <motion.p 
-            className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 md:mb-12" 
+          <motion.p
+            className="text-base sm:text-lg md:text-xl lg:text-2xl mb-4 sm:mb-6 md:mb-8"
             style={{ color: colors.textPrimary, opacity: 0.8 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.8 }}
