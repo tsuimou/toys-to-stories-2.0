@@ -10,6 +10,7 @@ import { StorybookReader } from "@/app/components/storybook-reader";
 import { VocabularyReview } from "@/app/components/vocabulary-review";
 import { getStoryForLanguage, StoryPage, VocabWord } from "@/app/data/story-translations";
 import { colors } from "@/utils/colors";
+import { generateStoryPdf } from "@/utils/pdf-generator";
 
 type Screen = "welcome" | "language" | "age" | "upload" | "toyName" | "personality" | "loading" | "story" | "vocabulary";
 
@@ -87,8 +88,18 @@ export default function App() {
     setCurrentScreen("welcome");
   };
 
-  const handleDownloadPdf = () => {
-    alert("PDF download would start here! In a real app, this would generate and download a PDF of the story and vocabulary.");
+  const handleDownloadPdf = async () => {
+    try {
+      await generateStoryPdf({
+        toyName: toyName || 'My Toy',
+        language: selectedLanguage,
+        pages: storyPages,
+        vocabulary: vocabularyWords,
+      });
+    } catch (error) {
+      console.error('Failed to generate PDF:', error);
+      alert('Failed to generate PDF. Please try again.');
+    }
   };
 
   // Onboarding screens use cloud background
@@ -159,6 +170,7 @@ export default function App() {
         {currentScreen === "story" && (
           <StorybookReader
             pages={storyPages}
+            language={selectedLanguage}
             onClose={() => setCurrentScreen("upload")}
             onComplete={handleStoryComplete}
           />

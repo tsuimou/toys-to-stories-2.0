@@ -150,18 +150,29 @@ export function LoadingScreen({
       setStage("finalizing");
 
       // Step 4: Transform to expected format with images
-      const storyWithImages: StoryPage[] = generatedStory.pages.map((page, index) => ({
-        pageNumber: page.pageNumber,
-        text: page.text,
-        imageUrl: generatedImages[index] || defaultImageUrls[index % defaultImageUrls.length],
-        vocabWords: index < 4 && generatedStory.vocabulary[index]
-          ? [{
-              word: generatedStory.vocabulary[index].word,
-              pronunciation: generatedStory.vocabulary[index].pronunciation,
-              definition: generatedStory.vocabulary[index].definition,
-            }]
-          : [],
-      }));
+      // Randomly pick 4 pages out of 6 for vocabulary words
+      const pageIndices = [0, 1, 2, 3, 4, 5];
+      const shuffled = [...pageIndices].sort(() => Math.random() - 0.5);
+      const vocabPageIndices = shuffled.slice(0, 4).sort((a, b) => a - b);
+
+      let vocabIndex = 0;
+      const storyWithImages: StoryPage[] = generatedStory.pages.map((page, index) => {
+        const hasVocab = vocabPageIndices.includes(index) && vocabIndex < generatedStory.vocabulary.length;
+        const vocabWord = hasVocab ? generatedStory.vocabulary[vocabIndex++] : null;
+
+        return {
+          pageNumber: page.pageNumber,
+          text: page.text,
+          imageUrl: generatedImages[index] || defaultImageUrls[index % defaultImageUrls.length],
+          vocabWords: vocabWord
+            ? [{
+                word: vocabWord.word,
+                pronunciation: vocabWord.pronunciation,
+                definition: vocabWord.definition,
+              }]
+            : [],
+        };
+      });
 
       const vocabularyWithIcons: VocabWord[] = generatedStory.vocabulary.map(v => ({
         word: v.word,
