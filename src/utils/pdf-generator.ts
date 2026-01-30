@@ -48,196 +48,245 @@ async function imageUrlToBase64(url: string): Promise<string | null> {
 export async function generateStoryPdf(options: PdfOptions): Promise<void> {
   const { toyName, language, pages, vocabulary } = options;
 
-  // Create PDF in portrait A4 format
+  // Create PDF in LANDSCAPE format to match storybook layout
   const pdf = new jsPDF({
-    orientation: 'portrait',
+    orientation: 'landscape',
     unit: 'mm',
     format: 'a4',
   });
 
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-  const margin = 20;
-  const contentWidth = pageWidth - (margin * 2);
+  const pageWidth = pdf.internal.pageSize.getWidth(); // 297mm in landscape
+  const pageHeight = pdf.internal.pageSize.getHeight(); // 210mm in landscape
+  const margin = 15;
 
-  // Colors
+  // Colors matching the storybook
   const primaryColor: [number, number, number] = [61, 139, 255]; // Royal Blue
   const textColor: [number, number, number] = [44, 62, 80];
   const accentColor: [number, number, number] = [155, 126, 222]; // Purple for pronunciation
+  const creamBg: [number, number, number] = [255, 248, 231]; // #FFF8E7
+  const darkBg: [number, number, number] = [42, 42, 64]; // #2a2a40
+  const bookRed: [number, number, number] = [220, 53, 69]; // Book cover red
 
-  // ===== TITLE PAGE =====
-  pdf.setFillColor(255, 248, 231); // Cream background
+  // ===== TITLE PAGE (like book cover) =====
+  // Dark night sky background
+  pdf.setFillColor(26, 26, 46); // #1a1a2e
   pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+
+  // Red book cover in center
+  const coverWidth = 180;
+  const coverHeight = 140;
+  const coverX = (pageWidth - coverWidth) / 2;
+  const coverY = (pageHeight - coverHeight) / 2;
+
+  // Book shadow
+  pdf.setFillColor(20, 20, 35);
+  pdf.roundedRect(coverX + 4, coverY + 4, coverWidth, coverHeight, 4, 4, 'F');
+
+  // Book cover
+  pdf.setFillColor(...bookRed);
+  pdf.roundedRect(coverX, coverY, coverWidth, coverHeight, 4, 4, 'F');
+
+  // Inner cream area
+  pdf.setFillColor(...creamBg);
+  pdf.roundedRect(coverX + 10, coverY + 10, coverWidth - 20, coverHeight - 20, 2, 2, 'F');
 
   // Title
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(32);
-  pdf.setTextColor(...primaryColor);
-
+  pdf.setFontSize(28);
+  pdf.setTextColor(...textColor);
   const title = `${toyName}'s Adventure`;
-  const titleWidth = pdf.getTextWidth(title);
-  pdf.text(title, (pageWidth - titleWidth) / 2, 80);
+  pdf.text(title, pageWidth / 2, coverY + 50, { align: 'center' });
 
   // Subtitle
-  pdf.setFontSize(16);
-  pdf.setTextColor(...textColor);
+  pdf.setFontSize(14);
   pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(...accentColor);
   const subtitle = `A Personalized Story in ${language}`;
-  const subtitleWidth = pdf.getTextWidth(subtitle);
-  pdf.text(subtitle, (pageWidth - subtitleWidth) / 2, 95);
+  pdf.text(subtitle, pageWidth / 2, coverY + 65, { align: 'center' });
 
   // Decorative line
   pdf.setDrawColor(...primaryColor);
-  pdf.setLineWidth(1);
-  pdf.line(margin + 30, 110, pageWidth - margin - 30, 110);
+  pdf.setLineWidth(0.5);
+  pdf.line(coverX + 40, coverY + 75, coverX + coverWidth - 40, coverY + 75);
 
-  // Footer on title page
+  // Footer on cover
   pdf.setFontSize(10);
   pdf.setTextColor(150, 150, 150);
-  const footer = 'Created with Toys to Stories';
-  const footerWidth = pdf.getTextWidth(footer);
-  pdf.text(footer, (pageWidth - footerWidth) / 2, pageHeight - 20);
+  pdf.text('Created with Toys to Stories', pageWidth / 2, coverY + coverHeight - 20, { align: 'center' });
 
-  // ===== STORY PAGES =====
+  // ===== STORY PAGES (book spread layout) =====
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
     pdf.addPage();
 
-    // Background
-    pdf.setFillColor(255, 248, 231);
-    pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+    // Two-page spread: left = image (dark bg), right = text (cream bg)
+    const halfWidth = pageWidth / 2;
 
-    // Page number header
-    pdf.setFontSize(12);
-    pdf.setTextColor(...primaryColor);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(`Page ${i + 1}`, margin, margin);
+    // Left page - Dark background with image
+    pdf.setFillColor(...darkBg);
+    pdf.rect(0, 0, halfWidth, pageHeight, 'F');
 
-    // Try to add image
-    let imageY = margin + 10;
-    const imageHeight = 100;
+    // Right page - Cream background for text
+    pdf.setFillColor(...creamBg);
+    pdf.rect(halfWidth, 0, halfWidth, pageHeight, 'F');
+
+    // Center spine line
+    pdf.setDrawColor(200, 200, 200);
+    pdf.setLineWidth(0.3);
+    pdf.line(halfWidth, 0, halfWidth, pageHeight);
+
+    // Add image on left side
+    const imageMargin = 12;
+    const imageWidth = halfWidth - (imageMargin * 2);
+    const imageHeight = pageHeight - (imageMargin * 2);
 
     try {
       const imageData = await imageUrlToBase64(page.imageUrl);
       if (imageData) {
-        // Add image centered
-        const imageWidth = contentWidth;
-        const imageX = margin;
-        pdf.addImage(imageData, 'JPEG', imageX, imageY, imageWidth, imageHeight, undefined, 'MEDIUM');
+        pdf.addImage(
+          imageData,
+          'JPEG',
+          imageMargin,
+          imageMargin,
+          imageWidth,
+          imageHeight,
+          undefined,
+          'MEDIUM'
+        );
       }
     } catch (error) {
       console.error('Failed to add image to PDF:', error);
-      // Draw placeholder rectangle
-      pdf.setFillColor(230, 230, 230);
-      pdf.rect(margin, imageY, contentWidth, imageHeight, 'F');
+      // Draw placeholder
+      pdf.setFillColor(60, 60, 80);
+      pdf.roundedRect(imageMargin, imageMargin, imageWidth, imageHeight, 4, 4, 'F');
       pdf.setTextColor(150, 150, 150);
       pdf.setFontSize(14);
-      pdf.text('Image not available', pageWidth / 2, imageY + imageHeight / 2, { align: 'center' });
+      pdf.text('Image', halfWidth / 2, pageHeight / 2, { align: 'center' });
     }
 
-    // Story text
-    const textY = imageY + imageHeight + 15;
-    pdf.setFont('helvetica', 'normal');
+    // Right side - Story text
+    const textX = halfWidth + margin;
+    const textWidth = halfWidth - (margin * 2);
+    const textY = margin + 20;
+
+    // Page number
+    pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(14);
+    pdf.setTextColor(...primaryColor);
+    pdf.text(`${i + 1}`, halfWidth + halfWidth / 2, margin + 5, { align: 'center' });
+
+    // Story text - larger, child-friendly font
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(16);
     pdf.setTextColor(...textColor);
 
-    // Word wrap the text
-    const lines = pdf.splitTextToSize(page.text, contentWidth);
-    pdf.text(lines, margin, textY);
+    const lines = pdf.splitTextToSize(page.text, textWidth);
+    pdf.text(lines, textX, textY + 15, { lineHeightFactor: 1.8 });
 
-    // Vocab word highlight (if any on this page)
+    // Vocab word highlight box at bottom (if any)
     if (page.vocabWords && page.vocabWords.length > 0) {
-      const vocabY = textY + (lines.length * 7) + 15;
-
-      pdf.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2], 0.1);
-      pdf.roundedRect(margin, vocabY - 5, contentWidth, 25, 3, 3, 'F');
-
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(12);
-      pdf.setTextColor(...primaryColor);
-      pdf.text('Vocabulary:', margin + 5, vocabY + 5);
-
       const vocabWord = page.vocabWords[0];
-      pdf.setFont('helvetica', 'normal');
+      const boxY = pageHeight - 50;
+      const boxHeight = 35;
+
+      // Vocab box with primary color border
+      pdf.setFillColor(245, 248, 255);
+      pdf.setDrawColor(...primaryColor);
+      pdf.setLineWidth(1);
+      pdf.roundedRect(textX, boxY, textWidth, boxHeight, 3, 3, 'FD');
+
+      // Star icon (text representation)
+      pdf.setFontSize(14);
+      pdf.setTextColor(...primaryColor);
+      pdf.text('New Word:', textX + 5, boxY + 12);
+
+      // Word
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(14);
       pdf.setTextColor(...textColor);
-      const vocabText = `${vocabWord.word} - ${vocabWord.definition}`;
-      const vocabLines = pdf.splitTextToSize(vocabText, contentWidth - 10);
-      pdf.text(vocabLines, margin + 5, vocabY + 15);
+      pdf.text(vocabWord.word, textX + 40, boxY + 12);
+
+      // Definition
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(11);
+      const defLines = pdf.splitTextToSize(vocabWord.definition, textWidth - 10);
+      pdf.text(defLines[0], textX + 5, boxY + 25);
     }
 
-    // Page footer
+    // Page indicator at bottom
     pdf.setFontSize(10);
     pdf.setTextColor(180, 180, 180);
-    pdf.text(`${i + 1} / ${pages.length}`, pageWidth / 2, pageHeight - 15, { align: 'center' });
+    pdf.text(`Page ${i + 1} of ${pages.length}`, halfWidth + halfWidth / 2, pageHeight - 8, { align: 'center' });
   }
 
   // ===== VOCABULARY REVIEW PAGE =====
   pdf.addPage();
 
-  // Background
-  pdf.setFillColor(255, 248, 231);
+  // Night sky background like the app
+  pdf.setFillColor(26, 26, 46);
   pdf.rect(0, 0, pageWidth, pageHeight, 'F');
 
-  // Header
+  // Header with stars
+  pdf.setFontSize(10);
+  pdf.setTextColor(255, 215, 0);
+  pdf.text('⭐', 80, 25);
+  pdf.text('⭐', pageWidth - 80, 25);
+
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(24);
-  pdf.setTextColor(...primaryColor);
-  const vocabTitle = 'Words You Learned!';
-  const vocabTitleWidth = pdf.getTextWidth(vocabTitle);
-  pdf.text(vocabTitle, (pageWidth - vocabTitleWidth) / 2, margin + 10);
+  pdf.setFontSize(28);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text('Words You Learned!', pageWidth / 2, 30, { align: 'center' });
 
-  // Decorative line
-  pdf.setDrawColor(...primaryColor);
-  pdf.setLineWidth(0.5);
-  pdf.line(margin + 20, margin + 18, pageWidth - margin - 20, margin + 18);
-
-  // Vocabulary list
-  let vocabListY = margin + 35;
-  const vocabItemHeight = 35;
+  // Vocabulary cards in a grid
+  const cardWidth = 130;
+  const cardHeight = 45;
+  const cardsPerRow = 2;
+  const startX = (pageWidth - (cardWidth * cardsPerRow + 20)) / 2;
+  const startY = 50;
 
   for (let i = 0; i < vocabulary.length; i++) {
     const vocab = vocabulary[i];
+    const row = Math.floor(i / cardsPerRow);
+    const col = i % cardsPerRow;
+
+    const cardX = startX + (col * (cardWidth + 20));
+    const cardY = startY + (row * (cardHeight + 15));
 
     // Check if we need a new page
-    if (vocabListY + vocabItemHeight > pageHeight - margin) {
+    if (cardY + cardHeight > pageHeight - 20) {
       pdf.addPage();
-      pdf.setFillColor(255, 248, 231);
+      pdf.setFillColor(26, 26, 46);
       pdf.rect(0, 0, pageWidth, pageHeight, 'F');
-      vocabListY = margin;
     }
 
-    // Card background
+    // White card
     pdf.setFillColor(255, 255, 255);
-    pdf.roundedRect(margin, vocabListY, contentWidth, vocabItemHeight - 5, 3, 3, 'F');
+    pdf.roundedRect(cardX, cardY, cardWidth, cardHeight, 4, 4, 'F');
 
     // Word
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(14);
     pdf.setTextColor(...textColor);
-    pdf.text(vocab.word, margin + 5, vocabListY + 10);
+    pdf.text(vocab.word, cardX + 8, cardY + 14);
 
     // Pronunciation
     pdf.setFont('helvetica', 'italic');
-    pdf.setFontSize(11);
+    pdf.setFontSize(10);
     pdf.setTextColor(...accentColor);
-    pdf.text(vocab.pronunciation, margin + 5, vocabListY + 18);
+    pdf.text(vocab.pronunciation, cardX + 8, cardY + 24);
 
-    // Definition
+    // Definition (truncated if too long)
     pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(11);
-    pdf.setTextColor(...textColor);
-    const defLines = pdf.splitTextToSize(vocab.definition, contentWidth - 10);
-    pdf.text(defLines[0], margin + 5, vocabListY + 26);
-
-    vocabListY += vocabItemHeight;
+    pdf.setFontSize(9);
+    pdf.setTextColor(100, 100, 100);
+    const defLines = pdf.splitTextToSize(vocab.definition, cardWidth - 16);
+    pdf.text(defLines.slice(0, 2).join(' '), cardX + 8, cardY + 34);
   }
 
-  // Final footer
-  pdf.setFontSize(10);
-  pdf.setTextColor(180, 180, 180);
-  const finalFooter = 'Keep learning and exploring!';
-  const finalFooterWidth = pdf.getTextWidth(finalFooter);
-  pdf.text(finalFooter, (pageWidth - finalFooterWidth) / 2, pageHeight - 15);
+  // Footer
+  pdf.setFontSize(11);
+  pdf.setTextColor(150, 150, 150);
+  pdf.text('Keep learning and exploring!', pageWidth / 2, pageHeight - 15, { align: 'center' });
 
   // Save the PDF
   const filename = `${toyName.replace(/[^a-zA-Z0-9]/g, '_')}_story.pdf`;
