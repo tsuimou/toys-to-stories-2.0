@@ -179,6 +179,7 @@ export default function App() {
         {currentScreen === "vocabulary" && (
           <VocabularyReview
             vocabularyWords={vocabularyWords}
+            language={selectedLanguage}
             onDownloadPdf={handleDownloadPdf}
             onStartOver={handleStartOver}
             onBack={() => setCurrentScreen("story")}

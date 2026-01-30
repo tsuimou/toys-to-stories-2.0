@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { Star, Volume2, Download, RotateCcw } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { colors, withOpacity } from "@/utils/colors";
 import { BackButton } from "@/app/components/back-button";
 
@@ -13,12 +13,177 @@ interface VocabWord {
 
 interface VocabularyReviewProps {
   vocabularyWords: VocabWord[];
+  language: string;
   onDownloadPdf: () => void;
   onStartOver: () => void;
   onBack: () => void;
 }
 
-export function VocabularyReview({ vocabularyWords, onDownloadPdf, onStartOver, onBack }: VocabularyReviewProps) {
+// Map app language names to Web Speech API language codes
+const languageCodeMap: Record<string, string> = {
+  'Spanish': 'es-ES',
+  'French': 'fr-FR',
+  'German': 'de-DE',
+  'Japanese': 'ja-JP',
+  'Korean': 'ko-KR',
+  'Hindi': 'hi-IN',
+  'Mandarin (Simplified)': 'zh-CN',
+  'Mandarin (Traditional)': 'zh-TW',
+  'Chinese (Simplified)': 'zh-CN',
+  'Chinese (Traditional)': 'zh-TW',
+};
+
+export function VocabularyReview({ vocabularyWords, language, onDownloadPdf, onStartOver, onBack }: VocabularyReviewProps) {
+  const [speakingWord, setSpeakingWord] = useState<string | null>(null);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Initialize audio element
+  useEffect(() => {
+    audioRef.current = new Audio();
+    audioRef.current.onended = () => {
+      setSpeakingWord(null);
+    };
+    audioRef.current.onerror = () => {
+      setSpeakingWord(null);
+      setIsLoadingAudio(false);
+    };
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  // Ensure voices are loaded
+  useEffect(() => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
+  }, []);
+
+  // Get the best available voice for a language
+  const getBestVoice = (langCode: string): SpeechSynthesisVoice | null => {
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length === 0) return null;
+
+    const matchingVoices = voices.filter(voice =>
+      voice.lang.startsWith(langCode.split('-')[0]) || voice.lang === langCode
+    );
+
+    if (matchingVoices.length === 0) return null;
+
+    const sortedVoices = matchingVoices.sort((a, b) => {
+      const premiumKeywords = ['premium', 'enhanced', 'neural', 'wavenet', 'natural'];
+      const aIsPremium = premiumKeywords.some(kw => a.name.toLowerCase().includes(kw));
+      const bIsPremium = premiumKeywords.some(kw => b.name.toLowerCase().includes(kw));
+
+      if (aIsPremium && !bIsPremium) return -1;
+      if (!aIsPremium && bIsPremium) return 1;
+      if (a.localService && !b.localService) return -1;
+      if (!a.localService && b.localService) return 1;
+      if (a.lang === langCode && b.lang !== langCode) return -1;
+      if (a.lang !== langCode && b.lang === langCode) return 1;
+
+      return 0;
+    });
+
+    return sortedVoices[0];
+  };
+
+  // Browser TTS fallback
+  const speakWithBrowserTTS = (word: string) => {
+    if (!('speechSynthesis' in window)) return;
+
+    window.speechSynthesis.cancel();
+    const wordToSpeak = word.split(' (')[0].trim();
+    const utterance = new SpeechSynthesisUtterance(wordToSpeak);
+    const langCode = languageCodeMap[language] || 'en-US';
+    utterance.lang = langCode;
+    utterance.rate = 0.8;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    const bestVoice = getBestVoice(langCode);
+    if (bestVoice) {
+      utterance.voice = bestVoice;
+    }
+
+    utterance.onstart = () => setSpeakingWord(word);
+    utterance.onend = () => setSpeakingWord(null);
+    utterance.onerror = () => setSpeakingWord(null);
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // ElevenLabs TTS with fallback
+  const speakWord = async (word: string) => {
+    // Stop any currently playing audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    window.speechSynthesis.cancel();
+
+    // Set to false to enable ElevenLabs TTS
+    const USE_BROWSER_TTS_ONLY = false;
+    if (USE_BROWSER_TTS_ONLY) {
+      speakWithBrowserTTS(word);
+      return;
+    }
+
+    setIsLoadingAudio(true);
+    setSpeakingWord(word);
+
+    try {
+      const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: word, language }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ fallback: true }));
+        if (errorData.fallback) {
+          setIsLoadingAudio(false);
+          speakWithBrowserTTS(word);
+          return;
+        }
+        throw new Error(errorData.error || 'TTS request failed');
+      }
+
+      const contentType = response.headers.get('Content-Type');
+      if (!contentType?.includes('audio')) {
+        setIsLoadingAudio(false);
+        speakWithBrowserTTS(word);
+        return;
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl;
+        setIsLoadingAudio(false);
+        await audioRef.current.play();
+      }
+
+      audioRef.current?.addEventListener('ended', () => {
+        URL.revokeObjectURL(audioUrl);
+      }, { once: true });
+
+    } catch (error) {
+      console.error('ElevenLabs TTS error:', error);
+      setIsLoadingAudio(false);
+      speakWithBrowserTTS(word);
+    }
+  };
+
   // Generate consistent star positions that don't change
   const stars = useMemo(() => {
     return [...Array(30)].map((_, i) => ({
@@ -218,15 +383,28 @@ export function VocabularyReview({ vocabularyWords, onDownloadPdf, onStartOver, 
                         <motion.button
                           className="rounded-lg p-2 flex-shrink-0"
                           style={{
-                            backgroundColor: borderColor,
-                            boxShadow: `0 2px 0 ${borderColor}dd, 0 3px 6px rgba(0,0,0,0.2)`
+                            backgroundColor: speakingWord === vocab.word ? '#4CAF50' : borderColor,
+                            boxShadow: speakingWord === vocab.word
+                              ? '0 2px 0 #388E3C, 0 3px 6px rgba(0,0,0,0.2), 0 0 12px rgba(76,175,80,0.5)'
+                              : `0 2px 0 ${borderColor}dd, 0 3px 6px rgba(0,0,0,0.2)`,
+                            cursor: isLoadingAudio ? 'wait' : 'pointer'
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            alert(`Playing pronunciation for "${vocab.word}"`);
+                            if (!isLoadingAudio) {
+                              speakWord(vocab.word);
+                            }
                           }}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.95 }}
+                          whileHover={isLoadingAudio ? {} : { scale: 1.1 }}
+                          whileTap={isLoadingAudio ? {} : { scale: 0.95 }}
+                          animate={speakingWord === vocab.word ? {
+                            scale: [1, 1.15, 1],
+                          } : {}}
+                          transition={speakingWord === vocab.word ? {
+                            duration: 0.6,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          } : {}}
                         >
                           <Volume2 size={18} style={{ color: colors.white }} />
                         </motion.button>
