@@ -103,8 +103,8 @@ export default function App() {
   };
 
   // Onboarding screens use cloud background
-  const isOnboarding = ['welcome', 'language', 'age', 'upload', 'toyName', 'personality'].includes(currentScreen);
-  const isDarkScreen = ['loading', 'story', 'vocabulary'].includes(currentScreen);
+  const isOnboarding = ['language', 'age', 'upload', 'toyName', 'personality'].includes(currentScreen);
+  const isDarkScreen = ['welcome', 'loading', 'story', 'vocabulary'].includes(currentScreen);
 
   return (
     <div
@@ -113,7 +113,7 @@ export default function App() {
         backgroundColor: isDarkScreen ? '#1a1a2e' : '#FFF9F0',
       }}
     >
-      <div className={currentScreen === 'story' || currentScreen === 'loading' || currentScreen === 'vocabulary' ? 'w-full h-full' : 'w-full max-w-[1024px] min-h-full'}>
+      <div className={currentScreen === 'welcome' || currentScreen === 'story' || currentScreen === 'loading' || currentScreen === 'vocabulary' ? 'w-full h-full' : 'w-full max-w-[1024px] min-h-full'}>
         {currentScreen === "welcome" && (
           <Welcome onGetStarted={handleGetStarted} />
         )}
