@@ -188,49 +188,85 @@ export function VocabularyReview({ vocabularyWords, onDownloadPdf, onStartOver, 
         <div className="flex flex-wrap justify-center gap-4 sm:gap-6 pb-4">
           <motion.button
             onClick={onDownloadPdf}
-            className="rounded-3xl px-10 py-5 flex items-center gap-3 transition-all"
+            className="rounded-full px-10 py-4 flex items-center gap-3 transition-all"
             style={{
-              backgroundColor: colors.primary,
+              background: `linear-gradient(180deg, ${colors.royalBlue} 0%, #2563C7 100%)`,
               color: colors.white,
-              fontSize: '18px',
+              fontSize: '20px',
               fontFamily: 'Fredoka, sans-serif',
-              fontWeight: 600,
-              boxShadow: `0 4px 16px ${withOpacity(colors.primary, 0.3)}`,
+              fontWeight: 700,
+              boxShadow: `
+                0 0 0 4px #1E4A8F,
+                0 5px 0 #1E4A8F,
+                0 7px 15px rgba(0,0,0,0.3)
+              `,
               border: 'none',
-              width: '280px',
-              justifyContent: 'center'
+              minWidth: '220px',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
             }}
-            whileHover={{ 
+            whileHover={{
               scale: 1.05,
-              boxShadow: `0 6px 24px ${withOpacity(colors.primary, 0.4)}`
+              boxShadow: `
+                0 0 0 4px #1E4A8F,
+                0 6px 0 #1E4A8F,
+                0 8px 18px rgba(0,0,0,0.35)
+              `
             }}
-            whileTap={{ scale: 0.98 }}
+            whileTap={{
+              scale: 0.95,
+              boxShadow: `
+                0 0 0 4px #1E4A8F,
+                0 2px 0 #1E4A8F,
+                0 4px 10px rgba(0,0,0,0.3)
+              `,
+              translateY: 3
+            }}
           >
-            <Download size={22} />
+            <Download size={22} style={{ filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.3))' }} />
             Download PDF
           </motion.button>
 
           <motion.button
             onClick={onStartOver}
-            className="rounded-3xl px-10 py-5 flex items-center gap-3 transition-all"
+            className="rounded-full px-10 py-4 flex items-center gap-3 transition-all"
             style={{
-              backgroundColor: 'white',
+              background: `linear-gradient(180deg, #EFEFEF 0%, #D1D1D1 100%)`,
               color: '#2C3E50',
-              fontSize: '18px',
+              fontSize: '20px',
               fontFamily: 'Fredoka, sans-serif',
-              fontWeight: 600,
-              border: '2px solid #2C3E50',
-              width: '280px',
+              fontWeight: 700,
+              boxShadow: `
+                0 0 0 4px #A0A0A0,
+                0 5px 0 #A0A0A0,
+                0 7px 15px rgba(0,0,0,0.3)
+              `,
+              border: 'none',
+              minWidth: '220px',
               justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+              cursor: 'pointer',
+              textShadow: '1px 1px 0 rgba(255,255,255,0.5)'
             }}
-            whileHover={{ 
+            whileHover={{
               scale: 1.05,
-              boxShadow: '0 4px 16px rgba(44, 62, 80, 0.2)'
+              boxShadow: `
+                0 0 0 4px #A0A0A0,
+                0 6px 0 #A0A0A0,
+                0 8px 18px rgba(0,0,0,0.35)
+              `
             }}
-            whileTap={{ scale: 0.98 }}
+            whileTap={{
+              scale: 0.95,
+              boxShadow: `
+                0 0 0 4px #A0A0A0,
+                0 2px 0 #A0A0A0,
+                0 4px 10px rgba(0,0,0,0.3)
+              `,
+              translateY: 3
+            }}
           >
-            <RotateCcw size={22} />
+            <RotateCcw size={22} style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))' }} />
             Start Over
           </motion.button>
         </div>
